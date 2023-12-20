@@ -23,7 +23,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "MundusRuntimeExample"
-        gdxVersion = '1.11.0'
+        gdxVersion = '1.12.0'
         roboVMVersion = '2.3.16'
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
@@ -87,6 +87,8 @@ project(":html") {
         api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion:sources"
         api "com.github.jamestkhan.mundus:commons:$mundusVersion:sources"
         api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
+        api(files('../libs/gdx-runtime-0.5.1-sources.jar'))
+        api(files('../libs/commons-0.5.1-sources.jar'))
     }
 }
 
@@ -96,7 +98,10 @@ project(":core") {
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion"
+
+        api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion"
+        api(files('../libs/gdx-runtime-0.5.1.jar'))
+        api(files('../libs/commons-0.5.1.jar'))
 
     }
 }
