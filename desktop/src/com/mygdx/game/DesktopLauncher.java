@@ -11,6 +11,7 @@ public class DesktopLauncher {
 		config.setTitle("MundusRuntimeExample");
 		config.setWindowedMode(1280, 720);
 		config.setBackBufferConfig(8,8,8,8,24,0,8);
+		config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30,3,3);
 		new Lwjgl3Application(new MundusExample(), config);
 	}
 }
