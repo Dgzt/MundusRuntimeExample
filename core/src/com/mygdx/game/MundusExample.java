@@ -220,7 +220,7 @@ public class MundusExample extends ApplicationAdapter {
 		mundus.dispose();
 	}
 
-	private static final int INSTANCE_COUNT_SIDE = 1;
+	private static final int INSTANCE_COUNT_SIDE = 5;
 	private static final int INSTANCE_COUNT = INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE;
 
 	private Mesh mesh;
@@ -302,30 +302,24 @@ public class MundusExample extends ApplicationAdapter {
 	private void createBoxField(){
 		texture = new Texture(Gdx.files.internal("graphics/zebra.png")); // our mascot!
 
-//		for (int x = 1; x <= INSTANCE_COUNT_SIDE; x++) {
-//			for (int y = 1; y <= INSTANCE_COUNT_SIDE; y++) {
-//				for (int z = 1; z <= INSTANCE_COUNT_SIDE; z++) {
-//					// set instance position
-//					vec3Temp.set(
-//							x / (INSTANCE_COUNT_SIDE * 0.5f) - 1f,
-//							y / (INSTANCE_COUNT_SIDE * 0.5f) - 1f,
-//							z / (INSTANCE_COUNT_SIDE * 0.5f) - 1f);
-//
-//					// set random rotation
-//					q.setEulerAngles(MathUtils.random(-90, 90), MathUtils.random(-90, 90), MathUtils.random(-90, 90));
-//
-//					// create matrix transform
-//					mat4.set(vec3Temp, q);
-//
-//					// put the 16 floats for mat4 in the float buffer
-//					offsets.put(mat4.getValues());
-//				}
-//			}
-//		}
+		for (int x = 1; x <= INSTANCE_COUNT_SIDE; x++) {
+			for (int z = 1; z <= INSTANCE_COUNT_SIDE; z++) {
+				// set instance position
+				vec3Temp.set(
+						270f - x * 30f,
+						40f,
+						430f - z * 30f);
 
-		vec3Temp.set(270f, 40f, 430f);
-		mat4.set(vec3Temp, q);
-		offsets.put(mat4.getValues());
+				// set random rotation
+//					q.setEulerAngles(MathUtils.random(-90, 90), MathUtils.random(-90, 90), MathUtils.random(-90, 90));
+
+				// create matrix transform
+				mat4.set(vec3Temp, q);
+
+				// put the 16 floats for mat4 in the float buffer
+				offsets.put(mat4.getValues());
+			}
+		}
 	}
 
 	/** See assets/shaders/instanced.vert + assets/shaders/instanced.frag files to see how:
