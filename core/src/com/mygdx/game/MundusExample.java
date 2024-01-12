@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
@@ -33,8 +34,11 @@ import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
+import com.mbrlabs.mundus.commons.utils.ShaderUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
@@ -86,7 +90,7 @@ public class MundusExample extends ApplicationAdapter {
 		config.asyncLoad = true; // Do asynchronous loading
 
 		// Start asynchronous loading
-		mundus = new Mundus(Gdx.files.internal("MundusExampleProject"), config);
+		mundus = new InstancedMundus(Gdx.files.internal("MundusExampleProject"), config);
 		try {
 			mundus.getAssetManager().queueAssetsForLoading(true);
 		} catch (MetaFileParseException e) {
@@ -95,6 +99,8 @@ public class MundusExample extends ApplicationAdapter {
 
 		// Queuing up your own assets to include in asynchronous loading
 		mundus.getAssetManager().getGdxAssetManager().load("beach.mp3", Music.class);
+
+		mundus.getAssetManager().getGdxAssetManager().load("models/tree1.gltf", SceneAsset.class);
 	}
 
 	@Override
@@ -160,7 +166,7 @@ public class MundusExample extends ApplicationAdapter {
 		scene.sceneGraph.update();
 		scene.render();
 
-		texture.bind();
+//		texture.bind();
 		scene.batch.begin(scene.cam);
 		scene.batch.render(renderable);
 		scene.batch.end();
@@ -182,7 +188,11 @@ public class MundusExample extends ApplicationAdapter {
 
 		if (mundus.continueLoading()) {
 			// Loading complete, load a scene.
-			scene = mundus.loadScene("Main Scene.mundus");
+			PBRShaderConfig config = ShaderUtils.buildPBRShaderConfig(mundus.getAssetManager().maxNumBones);
+			config.vertexShader = Gdx.files.internal("shaders/custom-gdx-pbr.vs.glsl").readString();
+			config.fragmentShader = Gdx.files.internal("shaders/custom-gdx-pbr.fs.glsl").readString();
+
+			scene = mundus.loadScene("Main Scene.mundus", config);
 
 			scene.cam.position.set(0, 40, 0);
 
@@ -226,7 +236,8 @@ public class MundusExample extends ApplicationAdapter {
 	private Mesh mesh;
 	private Texture texture;
 	private FloatBuffer offsets;
-	private Renderable renderable;
+//	private Renderable renderable;
+	private ModelInstance renderable;
 	private float size;
 	private Quaternion q;
 	private Matrix4 mat4;
@@ -234,49 +245,83 @@ public class MundusExample extends ApplicationAdapter {
 	private float[] floatTemp;
 
 	private void setupInstancedMesh() {
-		// Create a 3D cube mesh
-		mesh = new Mesh(true, 24, 36,
-				new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
-				new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoords0")
-		);
+		final SceneAsset treeAsset = mundus.getAssetManager().getGdxAssetManager().get("models/tree1.gltf");
 
-		// 24 vertices - one of the texture coordinates is flipped, but no big deal
-		float[] vertices = new float[] {
-				-size, size, -size, 0.0f, 1.0f,
-				size, size, -size, 1.0f, 1.0f,
-				size, -size, -size, 1.0f, 0.0f,
-				-size, -size, -size, 0.0f, 0.0f,
-				size, size, size, 1.0f, 1.0f,
-				-size, size, size, 0.0f, 1.0f,
-				-size, -size, size, 0.0f, 0.0f,
-				size, -size, size, 1.0f, 0.0f,
-				-size, size, size, 1.0f, 1.0f,
-				-size, size, -size, 0.0f, 1.0f,
-				-size, -size, -size, 0.0f, 0.0f,
-				-size, -size, size, 1.0f, 0.0f,
-				size, size, -size, 1.0f, 1.0f,
-				size, size, size, 0.0f, 1.0f,
-				size, -size, size, 0.0f, 0.0f,
-				size, -size, -size, 1.0f, 0.0f,
-				-size, size, size, 1.0f, 1.0f,
-				size, size, size, 0.0f, 1.0f,
-				size, size, -size, 0.0f, 0.0f,
-				-size, size, -size, 1.0f, 0.0f,
-				-size, -size, -size, 1.0f, 1.0f,
-				size, -size, -size, 0.0f, 1.0f,
-				size, -size, size, 0.0f, 0.0f,
-				-size, -size, size, 1.0f, 0.0f
-		};
+		renderable = new ModelInstance(treeAsset.scene.model);
 
-		// 36 indices
-		short[] indices = new short[]
-				{0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, 8, 9, 10, 10, 11, 8, 12, 13,
-						14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20 };
+		// assumes the instance has one node,  and the meshPart covers the whole mesh
+		for(int i = 0 ; i < renderable.nodes.first().parts.size; i++) {
+			Mesh mesh = renderable.nodes.first().parts.get(i).meshPart.mesh;
+			setupInstancedMesh(mesh);
+		}
 
-		mesh.setVertices(vertices);
-		mesh.setIndices(indices);
+//		// Create a 3D cube mesh
+//		mesh = new Mesh(true, 24, 36,
+//				new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+//				new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoords0")
+//		);
+//
+//		// 24 vertices - one of the texture coordinates is flipped, but no big deal
+//		float[] vertices = new float[] {
+//				-size, size, -size, 0.0f, 1.0f,
+//				size, size, -size, 1.0f, 1.0f,
+//				size, -size, -size, 1.0f, 0.0f,
+//				-size, -size, -size, 0.0f, 0.0f,
+//				size, size, size, 1.0f, 1.0f,
+//				-size, size, size, 0.0f, 1.0f,
+//				-size, -size, size, 0.0f, 0.0f,
+//				size, -size, size, 1.0f, 0.0f,
+//				-size, size, size, 1.0f, 1.0f,
+//				-size, size, -size, 0.0f, 1.0f,
+//				-size, -size, -size, 0.0f, 0.0f,
+//				-size, -size, size, 1.0f, 0.0f,
+//				size, size, -size, 1.0f, 1.0f,
+//				size, size, size, 0.0f, 1.0f,
+//				size, -size, size, 0.0f, 0.0f,
+//				size, -size, -size, 1.0f, 0.0f,
+//				-size, size, size, 1.0f, 1.0f,
+//				size, size, size, 0.0f, 1.0f,
+//				size, size, -size, 0.0f, 0.0f,
+//				-size, size, -size, 1.0f, 0.0f,
+//				-size, -size, -size, 1.0f, 1.0f,
+//				size, -size, -size, 0.0f, 1.0f,
+//				size, -size, size, 0.0f, 0.0f,
+//				-size, -size, size, 1.0f, 0.0f
+//		};
+//
+//		// 36 indices
+//		short[] indices = new short[]
+//				{0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, 8, 9, 10, 10, 11, 8, 12, 13,
+//						14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20 };
+//
+//		mesh.setVertices(vertices);
+//		mesh.setIndices(indices);
+//
+//		// Thanks JamesTKhan for saving me hours: how to pass a Matrix4 to the shader (using 4 x Vec4 = 16 floats)
+//		mesh.enableInstancedRendering(true, INSTANCE_COUNT,
+//				new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 0),
+//				new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 1),
+//				new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 2),
+//				new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 3));
+//
+//		// Create offset FloatBuffer that will hold matrix4 for each instance to pass to shader
+//		offsets = BufferUtils.newFloatBuffer(INSTANCE_COUNT * 16); // 16 floats for mat4
+//
+//		createBoxField(); // regular box field
+//
+//		((Buffer)offsets).position(0);
+//		mesh.setInstanceData(offsets);
+//
+//		renderable = new Renderable();
+//		renderable.meshPart.set("Cube", mesh, 0, 36, GL20.GL_TRIANGLES); // 36 indices
+//		renderable.environment = scene.environment;
+//		renderable.worldTransform.idt();
+//		renderable.shader = createShader(); // see method for more details
+//		renderable.shader.init();
+	}
 
-		// Thanks JamesTKhan for saving me hours: how to pass a Matrix4 to the shader (using 4 x Vec4 = 16 floats)
+	private void setupInstancedMesh(final Mesh mesh) {
+		// how to pass a Matrix4 to the shader (using 4 x Vec4 = 16 floats)
 		mesh.enableInstancedRendering(true, INSTANCE_COUNT,
 				new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 0),
 				new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 1),
@@ -286,21 +331,14 @@ public class MundusExample extends ApplicationAdapter {
 		// Create offset FloatBuffer that will hold matrix4 for each instance to pass to shader
 		offsets = BufferUtils.newFloatBuffer(INSTANCE_COUNT * 16); // 16 floats for mat4
 
-		createBoxField(); // regular box field
+		createBoxField();
 
 		((Buffer)offsets).position(0);
 		mesh.setInstanceData(offsets);
-
-		renderable = new Renderable();
-		renderable.meshPart.set("Cube", mesh, 0, 36, GL20.GL_TRIANGLES); // 36 indices
-		renderable.environment = scene.environment;
-		renderable.worldTransform.idt();
-		renderable.shader = createShader(); // see method for more details
-		renderable.shader.init();
 	}
 
 	private void createBoxField(){
-		texture = new Texture(Gdx.files.internal("graphics/zebra.png")); // our mascot!
+//		texture = new Texture(Gdx.files.internal("graphics/zebra.png")); // our mascot!
 
 		for (int x = 1; x <= INSTANCE_COUNT_SIDE; x++) {
 			for (int z = 1; z <= INSTANCE_COUNT_SIDE; z++) {
@@ -353,7 +391,7 @@ public class MundusExample extends ApplicationAdapter {
 				if (!program.isCompiled()) {
 					throw new GdxRuntimeException("Shader compile error: " + program.getLog());
 				}
-				init(program, renderable);
+//				init(program, renderable);
 			}
 
 			@Override
