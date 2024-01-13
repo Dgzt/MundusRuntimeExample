@@ -345,7 +345,7 @@ public class MundusExample extends ApplicationAdapter {
 				// set instance position
 				vec3Temp.set(
 						270f - x * 30f,
-						40f,
+						30f,
 						430f - z * 30f);
 
 				// set random rotation
