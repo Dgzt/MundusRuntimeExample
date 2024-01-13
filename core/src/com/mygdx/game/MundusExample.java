@@ -168,7 +168,7 @@ public class MundusExample extends ApplicationAdapter {
 
 //		texture.bind();
 		scene.batch.begin(scene.cam);
-		scene.batch.render(renderable);
+		scene.batch.render(renderable, scene.environment);
 		scene.batch.end();
 
 		fpsLogger.log();
