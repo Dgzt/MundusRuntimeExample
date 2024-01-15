@@ -19,11 +19,11 @@ public class InstancedMundus extends Mundus {
         super(mundusRoot, config);
     }
 
-    @Override
-    public Scene loadScene(String name, PBRShaderConfig config, DepthShader.Config depthConfig, RenderableSorter renderableSorter) {
-        final Scene scene = super.loadScene(name, config, depthConfig, renderableSorter);
-        scene.batch = new ModelBatch(new InstancedMundusPBRShaderProvider(config), renderableSorter);
-        scene.depthBatch = new ModelBatch(new PBRDepthShaderProvider(depthConfig));
-        return scene;
-    }
+//    @Override
+//    public Scene loadScene(String name, PBRShaderConfig config, DepthShader.Config depthConfig, RenderableSorter renderableSorter) {
+//        final Scene scene = super.loadScene(name, config, depthConfig, renderableSorter);
+//        scene.batch = new ModelBatch(new InstancedMundusPBRShaderProvider(config), renderableSorter);
+//        scene.depthBatch = new ModelBatch(new PBRDepthShaderProvider(depthConfig));
+//        return scene;
+//    }
 }

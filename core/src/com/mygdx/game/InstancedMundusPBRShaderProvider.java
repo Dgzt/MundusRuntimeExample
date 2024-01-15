@@ -12,9 +12,10 @@ public class InstancedMundusPBRShaderProvider extends MundusPBRShaderProvider {
 
     @Override
     protected PBRShader createShader(Renderable renderable, PBRShaderConfig config, String prefix) {
-        if (renderable.meshPart.mesh.isInstanced()) {
-            prefix += "#define instanced\n";
-        }
+//        if (renderable.meshPart.mesh.isInstanced()) {
+//            prefix += "#define instanced\n";
+//        }
+//        prefix += "#define instanced\n";
         return super.createShader(renderable, config, prefix);
     }
 }

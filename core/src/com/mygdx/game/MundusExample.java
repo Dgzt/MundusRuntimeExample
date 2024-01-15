@@ -11,8 +11,12 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.model.MeshPart;
+import com.badlogic.gdx.graphics.g3d.model.Node;
+import com.badlogic.gdx.graphics.g3d.model.NodePart;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
@@ -24,6 +28,7 @@ import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.commons.rendering.DefaultSceneRenderer;
+import com.mbrlabs.mundus.commons.shaders.MundusPBRShaderProvider;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
 import com.mbrlabs.mundus.commons.utils.ShaderUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
@@ -194,6 +199,10 @@ public class MundusExample extends ApplicationAdapter {
 			vec3Temp = new Vector3();
 
 			setupInstancedMesh();
+
+			// Add game object
+			final SceneAsset treeAsset = mundus.getAssetManager().getGdxAssetManager().get("models/tree1.gltf");
+			scene.sceneGraph.addGameObject(treeAsset.scene.model, new Vector3(250f, 30f, 400f));
 			//
 
 			// Update our game state
@@ -215,24 +224,47 @@ public class MundusExample extends ApplicationAdapter {
 	private static final int INSTANCE_COUNT = INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE;
 
 	private FloatBuffer offsets;
-	private ModelInstance renderable;
+	private Array<Renderable> renderables = new Array<>();
 	private Quaternion q;
 	private Matrix4 mat4;
 	private Vector3 vec3Temp;
 
 	private void setupInstancedMesh() {
 		final SceneAsset treeAsset = mundus.getAssetManager().getGdxAssetManager().get("models/tree1.gltf");
-
-		renderable = new ModelInstance(treeAsset.scene.model);
+		final Model model = treeAsset.scene.model;
 
 		// assumes the instance has one node,  and the meshPart covers the whole mesh
-		for(int i = 0 ; i < renderable.nodes.first().parts.size; i++) {
-			Mesh mesh = renderable.nodes.first().parts.get(i).meshPart.mesh;
-			setupInstancedMesh(mesh);
+		for(int i = 0 ; i < model.nodes.first().parts.size; i++) {
+			final Node node = model.nodes.first();
+			final NodePart nodePart = node.parts.get(i);
+
+			final VertexAttributes vertexAttributes = nodePart.meshPart.mesh.getVertexAttributes();
+			final int[] usages = new int[vertexAttributes.size()];
+			for (int ii = 0; ii < vertexAttributes.size(); ++ii) {
+				usages[ii] = vertexAttributes.get(ii).usage;
+			}
+
+			final Renderable renderable = new Renderable();
+			renderable.meshPart.set(new MeshPart(nodePart.meshPart));
+			renderable.meshPart.id += "0";
+			renderable.meshPart.mesh = renderable.meshPart.mesh.copy(true, false, usages);
+			setupInstancedMesh(node.translation, node.rotation, node.scale, renderable.meshPart.mesh);
+			renderable.material = nodePart.material;
+			renderable.environment = scene.environment;
+			renderable.worldTransform.idt();
+
+			PBRShaderConfig config = ShaderUtils.buildPBRShaderConfig(mundus.getAssetManager().maxNumBones);
+			config.vertexShader = Gdx.files.internal("shaders/custom-gdx-pbr.vs.glsl").readString();
+			config.fragmentShader = Gdx.files.internal("shaders/custom-gdx-pbr.fs.glsl").readString();
+			config.prefix = "#define instanced\n";
+
+			renderable.shader = new MundusPBRShaderProvider(config).getShader(renderable);
+
+			renderables.add(renderable);
 		}
 	}
 
-	private void setupInstancedMesh(final Mesh mesh) {
+	private void setupInstancedMesh(final Vector3 nodeTranslation, final Quaternion nodeRotation, final Vector3 nodeScale, final Mesh mesh) {
 		// how to pass a Matrix4 to the shader (using 4 x Vec4 = 16 floats)
 		mesh.enableInstancedRendering(true, INSTANCE_COUNT,
 				new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 0),
@@ -243,13 +275,13 @@ public class MundusExample extends ApplicationAdapter {
 		// Create offset FloatBuffer that will hold matrix4 for each instance to pass to shader
 		offsets = BufferUtils.newFloatBuffer(INSTANCE_COUNT * 16); // 16 floats for mat4
 
-		createBoxField();
+		createBoxField(nodeTranslation, nodeRotation, nodeScale);
 
 		((Buffer)offsets).position(0);
 		mesh.setInstanceData(offsets);
 	}
 
-	private void createBoxField(){
+	private void createBoxField(final Vector3 nodeTranslation, final Quaternion nodeRotation, final Vector3 nodeScale){
 		for (int x = 1; x <= INSTANCE_COUNT_SIDE; x++) {
 			for (int z = 1; z <= INSTANCE_COUNT_SIDE; z++) {
 				// set instance position
@@ -262,7 +294,8 @@ public class MundusExample extends ApplicationAdapter {
 //					q.setEulerAngles(MathUtils.random(-90, 90), MathUtils.random(-90, 90), MathUtils.random(-90, 90));
 
 				// create matrix transform
-				mat4.set(vec3Temp, q);
+				mat4.set(nodeTranslation, nodeRotation, nodeScale);
+				mat4.trn(vec3Temp);
 
 				// put the 16 floats for mat4 in the float buffer
 				offsets.put(mat4.getValues());
@@ -275,7 +308,9 @@ public class MundusExample extends ApplicationAdapter {
 		@Override
 		protected void renderObjects(Scene scene) {
 			super.renderObjects(scene);
-			scene.batch.render(renderable, scene.environment);
+			for (int i = 0; i < renderables.size; ++i) {
+				scene.batch.render(renderables.get(i));
+			}
 		}
 	}
 
