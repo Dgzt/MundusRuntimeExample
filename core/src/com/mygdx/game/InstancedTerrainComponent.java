@@ -62,13 +62,6 @@ public class InstancedTerrainComponent extends CullableComponent implements Rend
             renderable.environment = scene.environment;
             renderable.worldTransform.idt();
 
-            PBRShaderConfig config = ShaderUtils.buildPBRShaderConfig(maxNumBones);
-            config.vertexShader = Gdx.files.internal("shaders/custom-gdx-pbr.vs.glsl").readString();
-            config.fragmentShader = Gdx.files.internal("shaders/custom-gdx-pbr.fs.glsl").readString();
-            config.prefix = "#define instanced\n";
-
-            renderable.shader = new MundusPBRShaderProvider(config).getShader(renderable);
-
             renderables.add(renderable);
         }
 
