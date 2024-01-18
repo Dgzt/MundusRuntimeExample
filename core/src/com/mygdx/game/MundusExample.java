@@ -182,7 +182,7 @@ public class MundusExample extends ApplicationAdapter {
 			final GameObject terrainGO = scene.sceneGraph.findByName("Terrain 2");
 
             try {
-                terrainGO.addComponent(new InstancedTerrainComponent(terrainGO, mundus.getAssetManager().maxNumBones, treeAsset.scene.model));
+                terrainGO.addComponent(new InstancedTerrainComponent(terrainGO, treeAsset.scene.model));
             } catch (InvalidComponentException e) {
                 throw new RuntimeException(e);
             }
