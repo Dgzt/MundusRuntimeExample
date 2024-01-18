@@ -15,27 +15,26 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.Pool;
 import com.mbrlabs.mundus.commons.scene3d.GameObject;
+import com.mbrlabs.mundus.commons.scene3d.components.AbstractComponent;
 import com.mbrlabs.mundus.commons.scene3d.components.Component;
-import com.mbrlabs.mundus.commons.scene3d.components.CullableComponent;
 import com.mbrlabs.mundus.commons.scene3d.components.RenderableComponent;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 
-public class InstancedTerrainComponent extends CullableComponent implements RenderableComponent {
+public class InstancedTerrainComponent extends AbstractComponent implements RenderableComponent {
 
     private static final int INSTANCE_COUNT_SIDE = 5;
     private static final int INSTANCE_COUNT = INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE;
 
     private final Matrix4 mat4 = new Matrix4();
     private final Vector3 vec3Temp = new Vector3();
-    private final ModelInstance modelInstance;
     private final RenderableProvider renderableProvider;
 
     public InstancedTerrainComponent(final GameObject go, final Model model) {
         super(go);
 
-        modelInstance = new ModelInstance(model);
+        final ModelInstance modelInstance = new ModelInstance(model);
 
         for(int i = 0 ; i < modelInstance.nodes.size; i++) {
             final Node node = modelInstance.nodes.get(i);
@@ -59,6 +58,11 @@ public class InstancedTerrainComponent extends CullableComponent implements Rend
                 modelInstance.getRenderables(renderables, pool);
             }
         };
+    }
+
+    @Override
+    public void update(float v) {
+        // NOOP
     }
 
     @Override
