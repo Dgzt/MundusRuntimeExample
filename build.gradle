@@ -28,7 +28,7 @@ allprojects {
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
         gdxControllersVersion = '2.2.1'
-        mundusVersion = 'v0.5.1'
+        mundusVersion = 'plugin-new-component-SNAPSHOT'
         gltfVersion = '2.1.0' // Only needed if targeting HTML, version should match what Mundus uses
     }
 
@@ -84,8 +84,8 @@ project(":html") {
         api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 
-        api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion:sources"
-        api "com.github.jamestkhan.mundus:commons:$mundusVersion:sources"
+        api "com.github.Dgzt.Mundus:gdx-runtime:$mundusVersion:sources"
+        api "com.github.Dgzt.Mundus:commons:$mundusVersion:sources"
         api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
     }
 }
@@ -96,7 +96,7 @@ project(":core") {
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion"
+        api "com.github.Dgzt.Mundus:gdx-runtime:$mundusVersion"
 
     }
 }
