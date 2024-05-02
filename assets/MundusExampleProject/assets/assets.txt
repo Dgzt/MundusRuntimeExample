@@ -1,5 +1,9 @@
 33ed_map_Ship2_01.mat
 33ed_map_Ship2_01.mat.meta
+Ship2_0002.gltf
+Ship2_0002.gltf.meta
+Water 31.water
+Water 31.water.meta
 aerial_beach_01_diff_2k.jpg
 aerial_beach_01_diff_2k.jpg.meta
 aerial_beach_01_nor_gl_2k.png
@@ -44,23 +48,19 @@ map_Ship2_01_Normal.png
 map_Ship2_01_Normal.png.meta
 night.sky
 night.sky.meta
-Ship2_0002.gltf
-Ship2_0002.gltf.meta
 ship_occlusion_metal_roughness.png
 ship_occlusion_metal_roughness.png.meta
 skybox_default.png
 skybox_default.png.meta
 star_night.png
 star_night.png.meta
-Terrain 2.terra
-Terrain 2.terra.meta
-Terrain 25.terra
-Terrain 25.terra.meta
 terrain_default.mat
 terrain_default.mat.meta
-Water 31.water
-Water 31.water.meta
 waterFoam.png
 waterFoam.png.meta
 waterNormal.png
 waterNormal.png.meta
+Terrain 2.terra
+Terrain 2.terra.meta
+Terrain 25.terra
+Terrain 25.terra.meta
