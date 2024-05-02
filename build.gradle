@@ -89,6 +89,8 @@ project(":html") {
         api "com.github.Dgzt.Mundus:gdx-runtime:$mundusVersion:sources"
         api "com.github.Dgzt.Mundus:commons:$mundusVersion:sources"
         api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
+
+        api "com.github.Dgzt:mundus-ode4j-plugin:$ode4jPluginVersion:sources"
     }
 }
 
