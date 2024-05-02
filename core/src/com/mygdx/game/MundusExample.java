@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.github.dgzt.mundus.plugin.ode4j.converter.Ode4jPhysicsComponentConverter;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
@@ -66,8 +67,10 @@ public class MundusExample extends ApplicationAdapter {
 		config.autoLoad = false; // Do not autoload, we want to queue custom assets
 		config.asyncLoad = true; // Do asynchronous loading
 
+		Ode4jPhysicsComponentConverter customComponentConverter = new Ode4jPhysicsComponentConverter();
+
 		// Start asynchronous loading
-		mundus = new Mundus(Gdx.files.internal("MundusExampleProject"), config);
+		mundus = new Mundus(Gdx.files.internal("MundusExampleProject"), config, customComponentConverter);
 		try {
 			mundus.getAssetManager().queueAssetsForLoading(true);
 		} catch (MetaFileParseException e) {
