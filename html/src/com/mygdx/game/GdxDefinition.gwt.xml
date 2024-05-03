@@ -7,6 +7,8 @@
 	<inherits name="commons" />
 	<inherits name="com.mbrlabs.mundus" />
 	<inherits name="ode4j_plugin" />
+	<inherits name="gdx_ode4j" />
+	<inherits name="formic" />
 
 	<entry-point class='com.mygdx.game.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
