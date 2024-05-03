@@ -91,6 +91,8 @@ project(":html") {
         api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
 
         api "com.github.Dgzt:mundus-ode4j-plugin:$ode4jPluginVersion:sources"
+        api "com.github.antzGames:gdx-ode4j:master-SNAPSHOT:sources"
+        api "com.github.tommyettinger:formic:0.1.4:sources"
     }
 }
 
