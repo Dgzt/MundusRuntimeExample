@@ -23,6 +23,7 @@ import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 import static com.badlogic.gdx.Application.LOG_INFO;
 
@@ -86,6 +87,7 @@ public class MundusExample extends ApplicationAdapter {
 
 		// Queuing up your own assets to include in asynchronous loading
 		mundus.getAssetManager().getGdxAssetManager().load("beach.mp3", Music.class);
+		mundus.getAssetManager().getGdxAssetManager().load("shapes/box/box.gltf", SceneAsset.class);
 
 		ode4jDebugRenderer = new DebugRenderer();
 	}
@@ -149,6 +151,8 @@ public class MundusExample extends ApplicationAdapter {
 		if (scene.cam.position.dst(cameraDestinations.get(0)) > 2500)
 			scene.cam.position.set(cameraDestinations.get(0));
 
+		MundusOde4jRuntimePlugin.update();
+
 		controller.update();
 		scene.sceneGraph.update();
 		scene.render();
@@ -177,7 +181,7 @@ public class MundusExample extends ApplicationAdapter {
 			// setup input
 			controller = new FirstPersonCameraController(scene.cam);
 			controller.setVelocity(200f);
-			customInputController = new CustomInputController(ode4jDebugRenderer);
+			customInputController = new CustomInputController(mundus, scene, ode4jDebugRenderer);
 			Gdx.input.setInputProcessor(new InputMultiplexer(customInputController, controller));
 
 			// Update our game state

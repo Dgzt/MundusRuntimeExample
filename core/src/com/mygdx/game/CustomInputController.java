@@ -3,13 +3,32 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.github.antzGames.gdx.ode4j.ode.DBody;
+import com.github.antzGames.gdx.ode4j.ode.DBox;
+import com.github.antzGames.gdx.ode4j.ode.DMass;
+import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
+import com.github.dgzt.mundus.plugin.ode4j.MundusOde4jRuntimePlugin;
+import com.github.dgzt.mundus.plugin.ode4j.component.Ode4jPhysicsComponent;
 import com.github.dgzt.mundus.plugin.ode4j.debug.DebugRenderer;
+import com.github.dgzt.mundus.plugin.ode4j.util.Ode4jPhysicsComponentUtils;
+import com.mbrlabs.mundus.commons.Scene;
+import com.mbrlabs.mundus.commons.scene3d.GameObject;
+import com.mbrlabs.mundus.runtime.Mundus;
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class CustomInputController extends InputAdapter {
 
+    private final Mundus mundus;
+    private final Scene scene;
     private final DebugRenderer debugRenderer;
 
-    public CustomInputController(final DebugRenderer debugRenderer) {
+    public CustomInputController(
+            final Mundus mundus,
+            final Scene scene,
+            final DebugRenderer debugRenderer
+    ) {
+        this.mundus = mundus;
+        this.scene = scene;
         this.debugRenderer = debugRenderer;
     }
 
@@ -24,6 +43,28 @@ public class CustomInputController extends InputAdapter {
             }
 
             return true;
+        }
+
+        if (Input.Keys.B == keycode) {
+            final SceneAsset boxSceneAsset = mundus.getAssetManager().getGdxAssetManager().get("shapes/box/box.gltf");
+            final GameObject boxGo = scene.sceneGraph.addGameObject(boxSceneAsset.scene.model, scene.cam.position);
+
+            final Ode4jPhysicsComponent physicsComponent = Ode4jPhysicsComponentUtils.createBoxPhysicsComponent(boxGo);
+            final DBox boxGeom = (DBox) physicsComponent.getGeom();
+
+            final DBody body  = MundusOde4jRuntimePlugin.getPhysicsWorld().createBody();
+            body.setPosition(scene.cam.position.x, scene.cam.position.y, scene.cam.position.z);
+
+            final DMass massInfo = OdeHelper.createMass();
+            massInfo.setBox(1.0, boxGeom.getLengths());
+            massInfo.adjust(10.0);
+            body.setMass(massInfo);
+            body.setAutoDisableDefaults();
+
+            boxGeom.setBody(body);
+            physicsComponent.setBody(body);
+
+            MundusOde4jRuntimePlugin.getPhysicsWorld().getPhysicsComponents().add(physicsComponent);
         }
 
         return false;
