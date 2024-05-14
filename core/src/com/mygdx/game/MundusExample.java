@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.github.dgzt.mundus.plugin.ode4j.MundusOde4jRuntimePlugin;
 import com.github.dgzt.mundus.plugin.ode4j.converter.Ode4jPhysicsComponentConverter;
+import com.github.dgzt.mundus.plugin.ode4j.debug.DebugRenderer;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
@@ -30,9 +32,12 @@ public class MundusExample extends ApplicationAdapter {
 	private Mundus mundus;
 	private Scene scene;
 
+	private DebugRenderer ode4jDebugRenderer;
+
 	private GameState gameState = GameState.LOADING;
 
 	private FirstPersonCameraController controller;
+	private CustomInputController customInputController;
 	private ShapeRenderer shapeRenderer;
 	private final Color mundusTeal = new Color(0x00b695ff);
 
@@ -81,6 +86,8 @@ public class MundusExample extends ApplicationAdapter {
 
 		// Queuing up your own assets to include in asynchronous loading
 		mundus.getAssetManager().getGdxAssetManager().load("beach.mp3", Music.class);
+
+		ode4jDebugRenderer = new DebugRenderer();
 	}
 
 	@Override
@@ -145,6 +152,7 @@ public class MundusExample extends ApplicationAdapter {
 		controller.update();
 		scene.sceneGraph.update();
 		scene.render();
+		ode4jDebugRenderer.render(scene.cam);
 		fpsLogger.log();
 	}
 
@@ -169,7 +177,8 @@ public class MundusExample extends ApplicationAdapter {
 			// setup input
 			controller = new FirstPersonCameraController(scene.cam);
 			controller.setVelocity(200f);
-			Gdx.input.setInputProcessor(controller);
+			customInputController = new CustomInputController(ode4jDebugRenderer);
+			Gdx.input.setInputProcessor(new InputMultiplexer(customInputController, controller));
 
 			// Update our game state
 			gameState = GameState.PLAYING;
