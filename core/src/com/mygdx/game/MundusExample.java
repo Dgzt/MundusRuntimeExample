@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.github.dgzt.mundus.plugin.ode4j.MundusOde4jRuntimePlugin;
 import com.github.dgzt.mundus.plugin.ode4j.converter.Ode4jPhysicsComponentConverter;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
@@ -67,6 +68,7 @@ public class MundusExample extends ApplicationAdapter {
 		config.autoLoad = false; // Do not autoload, we want to queue custom assets
 		config.asyncLoad = true; // Do asynchronous loading
 
+		MundusOde4jRuntimePlugin.init();
 		Ode4jPhysicsComponentConverter customComponentConverter = new Ode4jPhysicsComponentConverter();
 
 		// Start asynchronous loading
