@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.math.Vector3;
 import com.github.dgzt.mundus.plugin.ode4j.MundusOde4jRuntimePlugin;
 import com.github.dgzt.mundus.plugin.ode4j.component.Ode4jPhysicsComponent;
 import com.github.dgzt.mundus.plugin.ode4j.debug.DebugRenderer;
@@ -14,6 +15,8 @@ import com.mbrlabs.mundus.runtime.Mundus;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class CustomInputController extends InputAdapter {
+
+    private static final double FORCE = 50.0;
 
     private final Mundus mundus;
     private final Scene scene;
@@ -53,6 +56,9 @@ public class CustomInputController extends InputAdapter {
                 throw new RuntimeException(e);
             }
             MundusOde4jRuntimePlugin.getPhysicsWorld().getPhysicsComponents().add(physicsComponent);
+
+            final Vector3 camDirection = scene.cam.direction;
+            physicsComponent.getBody().setLinearVel(FORCE * camDirection.x, FORCE * camDirection.y, FORCE * camDirection.z);
         }
 
         return false;
