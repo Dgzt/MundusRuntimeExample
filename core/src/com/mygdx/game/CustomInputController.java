@@ -45,22 +45,38 @@ public class CustomInputController extends InputAdapter {
             return true;
         }
 
-        if (Input.Keys.B == keycode) {
+        Ode4jPhysicsComponent physicsComponent = null;
+
+        if (Input.Keys.NUM_1 == keycode) {
             final SceneAsset boxSceneAsset = mundus.getAssetManager().getGdxAssetManager().get("shapes/box/box.gltf");
             final GameObject boxGo = scene.sceneGraph.addGameObject(boxSceneAsset.scene.model, scene.cam.position);
 
-            final Ode4jPhysicsComponent physicsComponent = Ode4jPhysicsComponentUtils.createBoxPhysicsComponent(boxGo, false);
+            physicsComponent = Ode4jPhysicsComponentUtils.createBoxPhysicsComponent(boxGo, false);
             try {
                 boxGo.addComponent(physicsComponent);
             } catch (InvalidComponentException e) {
                 throw new RuntimeException(e);
             }
+
+        }
+        if (Input.Keys.NUM_2 == keycode) {
+            final SceneAsset sphereSceneAsset = mundus.getAssetManager().getGdxAssetManager().get("shapes/sphere/sphere.gltf");
+            final GameObject sphereGo = scene.sceneGraph.addGameObject(sphereSceneAsset.scene.model, scene.cam.position);
+
+            physicsComponent = Ode4jPhysicsComponentUtils.createSpherePhysicsComponent(sphereGo, false, 1.0);
+            try {
+                sphereGo.addComponent(physicsComponent);
+            } catch (InvalidComponentException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (physicsComponent != null) {
             MundusOde4jRuntimePlugin.getPhysicsWorld().getPhysicsComponents().add(physicsComponent);
 
             final Vector3 camDirection = scene.cam.direction;
             physicsComponent.getBody().setLinearVel(FORCE * camDirection.x, FORCE * camDirection.y, FORCE * camDirection.z);
         }
-
         return false;
     }
 

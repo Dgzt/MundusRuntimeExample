@@ -88,6 +88,7 @@ public class MundusExample extends ApplicationAdapter {
 		// Queuing up your own assets to include in asynchronous loading
 		mundus.getAssetManager().getGdxAssetManager().load("beach.mp3", Music.class);
 		mundus.getAssetManager().getGdxAssetManager().load("shapes/box/box.gltf", SceneAsset.class);
+		mundus.getAssetManager().getGdxAssetManager().load("shapes/sphere/sphere.gltf", SceneAsset.class);
 
 		ode4jDebugRenderer = new DebugRenderer();
 	}
