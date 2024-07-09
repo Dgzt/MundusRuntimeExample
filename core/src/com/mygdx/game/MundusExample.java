@@ -89,6 +89,7 @@ public class MundusExample extends ApplicationAdapter {
 		mundus.getAssetManager().getGdxAssetManager().load("beach.mp3", Music.class);
 		mundus.getAssetManager().getGdxAssetManager().load("shapes/box/box.gltf", SceneAsset.class);
 		mundus.getAssetManager().getGdxAssetManager().load("shapes/sphere/sphere.gltf", SceneAsset.class);
+		mundus.getAssetManager().getGdxAssetManager().load("shapes/cylinder/cylinder.gltf", SceneAsset.class);
 
 		ode4jDebugRenderer = new DebugRenderer();
 	}

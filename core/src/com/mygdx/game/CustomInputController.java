@@ -59,6 +59,7 @@ public class CustomInputController extends InputAdapter {
             }
 
         }
+
         if (Input.Keys.NUM_2 == keycode) {
             final SceneAsset sphereSceneAsset = mundus.getAssetManager().getGdxAssetManager().get("shapes/sphere/sphere.gltf");
             final GameObject sphereGo = scene.sceneGraph.addGameObject(sphereSceneAsset.scene.model, scene.cam.position);
@@ -66,6 +67,18 @@ public class CustomInputController extends InputAdapter {
             physicsComponent = Ode4jPhysicsComponentUtils.createSpherePhysicsComponent(sphereGo, false, 1.0);
             try {
                 sphereGo.addComponent(physicsComponent);
+            } catch (InvalidComponentException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (Input.Keys.NUM_3 == keycode) {
+            final SceneAsset cylinderSceneAsset = mundus.getAssetManager().getGdxAssetManager().get("shapes/cylinder/cylinder.gltf");
+            final GameObject cylinderGo = scene.sceneGraph.addGameObject(cylinderSceneAsset.scene.model, scene.cam.position);
+
+            physicsComponent = Ode4jPhysicsComponentUtils.createCylinderPhysicsComponent(cylinderGo, false, 1, 2);
+            try {
+                cylinderGo.addComponent(physicsComponent);
             } catch (InvalidComponentException e) {
                 throw new RuntimeException(e);
             }
