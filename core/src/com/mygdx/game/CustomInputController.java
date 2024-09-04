@@ -51,7 +51,7 @@ public class CustomInputController extends InputAdapter {
             final SceneAsset boxSceneAsset = mundus.getAssetManager().getGdxAssetManager().get("shapes/box/box.gltf");
             final GameObject boxGo = scene.sceneGraph.addGameObject(boxSceneAsset.scene.model, scene.cam.position);
 
-            physicsComponent = Ode4jPhysicsComponentUtils.createBoxPhysicsComponent(boxGo, false);
+            physicsComponent = Ode4jPhysicsComponentUtils.createBoxPhysicsComponent(boxGo, 10.0);
             try {
                 boxGo.addComponent(physicsComponent);
             } catch (InvalidComponentException e) {
@@ -64,7 +64,7 @@ public class CustomInputController extends InputAdapter {
             final SceneAsset sphereSceneAsset = mundus.getAssetManager().getGdxAssetManager().get("shapes/sphere/sphere.gltf");
             final GameObject sphereGo = scene.sceneGraph.addGameObject(sphereSceneAsset.scene.model, scene.cam.position);
 
-            physicsComponent = Ode4jPhysicsComponentUtils.createSpherePhysicsComponent(sphereGo, false, 1.0);
+            physicsComponent = Ode4jPhysicsComponentUtils.createSpherePhysicsComponent(sphereGo, 1.0, 10.0);
             try {
                 sphereGo.addComponent(physicsComponent);
             } catch (InvalidComponentException e) {
@@ -76,7 +76,7 @@ public class CustomInputController extends InputAdapter {
             final SceneAsset cylinderSceneAsset = mundus.getAssetManager().getGdxAssetManager().get("shapes/cylinder/cylinder.gltf");
             final GameObject cylinderGo = scene.sceneGraph.addGameObject(cylinderSceneAsset.scene.model, scene.cam.position);
 
-            physicsComponent = Ode4jPhysicsComponentUtils.createCylinderPhysicsComponent(cylinderGo, false, 1, 2);
+            physicsComponent = Ode4jPhysicsComponentUtils.createCylinderPhysicsComponent(cylinderGo, 1, 2, 10.0);
             try {
                 cylinderGo.addComponent(physicsComponent);
             } catch (InvalidComponentException e) {
