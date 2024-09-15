@@ -23,12 +23,14 @@ allprojects {
     version = '1.0'
     ext {
         appName = "MundusRuntimeExample"
-        gdxVersion = '1.12.0'
+        gdxVersion = '1.12.1'
         roboVMVersion = '2.3.16'
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
         gdxControllersVersion = '2.2.1'
-        mundusVersion = 'v0.5.0'
+//        mundusVersion = 'v0.5.1'
+        mundusVersion = 'master-SNAPSHOT'
+        lwjgl3Version = '3.3.3'
         gltfVersion = '2.1.0' // Only needed if targeting HTML, version should match what Mundus uses
     }
 
@@ -50,8 +52,20 @@ project(":desktop") {
     dependencies {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+//        api "com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion"
+        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version"
+        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-linux"
+        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-linux-arm32"
+        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-linux-arm64"
+        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-macos"
+        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-macos-arm64"
+        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-windows"
+        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-windows-x86"
+        api "org.lwjgl:lwjgl-egl:$lwjgl3Version"
+
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        
+        api(files('../libs/gdx-lwjgl3-angle-vulkan-0.0.1-SNAPSHOT.jar'))
+
     }
 }
 
@@ -87,8 +101,6 @@ project(":html") {
         api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion:sources"
         api "com.github.jamestkhan.mundus:commons:$mundusVersion:sources"
         api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
-        api(files('../libs/gdx-runtime-0.5.1-sources.jar'))
-        api(files('../libs/commons-0.5.1-sources.jar'))
     }
 }
 
@@ -98,10 +110,7 @@ project(":core") {
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
-
-        api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion"
-        api(files('../libs/gdx-runtime-0.5.1.jar'))
-        api(files('../libs/commons-0.5.1.jar'))
+        api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion"
 
     }
 }

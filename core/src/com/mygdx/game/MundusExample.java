@@ -17,8 +17,10 @@ import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
+import com.mbrlabs.mundus.commons.utils.ShaderUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
 
 import static com.badlogic.gdx.Application.LOG_INFO;
 
@@ -46,6 +48,9 @@ public class MundusExample extends ApplicationAdapter {
 
 	@Override
 	public void create () {
+		System.out.println("OpenGL renderer: " + Gdx.graphics.getGLVersion().getRendererString());
+		System.out.println("OpenGL vendor: " + Gdx.graphics.getGLVersion().getVendorString());
+
 		fpsLogger = new FPSLogger();
 
 		Gdx.app.setLogLevel(LOG_INFO);
@@ -157,7 +162,10 @@ public class MundusExample extends ApplicationAdapter {
 
 		if (mundus.continueLoading()) {
 			// Loading complete, load a scene.
-			scene = mundus.loadScene("Main Scene.mundus");
+//			scene = mundus.loadScene("Main Scene.mundus");
+			PBRShaderConfig config = ShaderUtils.buildPBRShaderConfig(20);
+			config.glslVersion = "#version 300 es\n" + "#define GLSL3\n";
+			scene = mundus.loadScene("Main Scene.mundus", config);
 
 			scene.cam.position.set(0, 40, 0);
 
