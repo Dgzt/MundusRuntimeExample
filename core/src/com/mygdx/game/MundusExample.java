@@ -48,8 +48,9 @@ public class MundusExample extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-		System.out.println("OpenGL renderer: " + Gdx.graphics.getGLVersion().getRendererString());
-		System.out.println("OpenGL vendor: " + Gdx.graphics.getGLVersion().getVendorString());
+		System.out.println("OpenGL renderer: " + Gdx.gl.glGetString(GL20.GL_RENDERER));
+		System.out.println("OpenGL vendor: " + Gdx.gl.glGetString(GL20.GL_VENDOR));
+		System.out.println("OpenGL version: " + Gdx.gl.glGetString(GL20.GL_VERSION));
 
 		fpsLogger = new FPSLogger();
 
