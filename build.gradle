@@ -53,18 +53,20 @@ project(":desktop") {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
 //        api "com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion"
-        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version"
-        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-linux"
-        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-linux-arm32"
-        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-linux-arm64"
-        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-macos"
-        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-macos-arm64"
-        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-windows"
-        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-windows-x86"
-        api "org.lwjgl:lwjgl-egl:$lwjgl3Version"
 
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        api(files('../libs/gdx-lwjgl3-angle-vulkan-0.0.1-SNAPSHOT.jar'))
+//        api(files('../libs/gdx-lwjgl3-angle-vulkan-0.0.1-SNAPSHOT.jar'))
+//        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version"
+//        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-linux"
+//        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-linux-arm32"
+//        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-linux-arm64"
+//        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-macos"
+//        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-macos-arm64"
+//        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-windows"
+//        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-windows-x86"
+//        api "org.lwjgl:lwjgl-egl:$lwjgl3Version"
+
+        api 'com.github.Dgzt:gdx-lwjgl3-angle-vulkan:1.0.0'
 
     }
 }
