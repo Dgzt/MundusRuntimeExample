@@ -23,15 +23,15 @@ allprojects {
     version = '1.0'
     ext {
         appName = "MundusRuntimeExample"
-        gdxVersion = '1.12.1'
+        gdxVersion = '1.13.0'
         roboVMVersion = '2.3.16'
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
         gdxControllersVersion = '2.2.1'
 //        mundusVersion = 'v0.5.1'
         mundusVersion = 'master-SNAPSHOT'
-        lwjgl3Version = '3.3.3'
-        gltfVersion = '2.1.0' // Only needed if targeting HTML, version should match what Mundus uses
+        lwjgl3Version = '3.3.4'
+        gltfVersion = '2.2.1' // Only needed if targeting HTML, version should match what Mundus uses
     }
 
     repositories {
@@ -66,7 +66,13 @@ project(":desktop") {
 //        api "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-windows-x86"
 //        api "org.lwjgl:lwjgl-egl:$lwjgl3Version"
 
-        api 'com.github.Dgzt:gdx-lwjgl3-angle-vulkan:1.0.0'
+//        api 'com.github.Dgzt:gdx-lwjgl3-angle-vulkan:1.0.0'
+
+        implementation "org.lwjgl:lwjgl-opengles:$lwjgl3Version"
+        implementation "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-linux"
+        implementation "org.lwjgl:lwjgl-opengles:$lwjgl3Version:natives-windows"
+        implementation "org.lwjgl:lwjgl-egl:$lwjgl3Version"
+        api(files('../libs/gdx-lwjgl3-angle-vulkan-1.1.0-SNAPSHOT.jar'))
 
     }
 }
