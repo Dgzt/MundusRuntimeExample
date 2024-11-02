@@ -3,6 +3,15 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL30;
+import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CapsuleShapeBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.github.dgzt.mundus.plugin.ode4j.MundusOde4jRuntimePlugin;
 import com.github.dgzt.mundus.plugin.ode4j.component.Ode4jPhysicsComponent;
@@ -12,6 +21,7 @@ import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.scene3d.GameObject;
 import com.mbrlabs.mundus.commons.scene3d.InvalidComponentException;
 import com.mbrlabs.mundus.runtime.Mundus;
+import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class CustomInputController extends InputAdapter {
@@ -84,6 +94,32 @@ public class CustomInputController extends InputAdapter {
             }
         }
 
+        if (Input.Keys.NUM_4 == keycode) {
+            final float radius = 0.75f;
+            final float height = 3;
+
+            final ModelBuilder modelBuilder = new ModelBuilder();
+            modelBuilder.begin();
+            final MeshPartBuilder meshPartBuilder = modelBuilder.part(
+                    "part",
+                    GL30.GL_TRIANGLES,
+                    VertexAttributes.Usage.Position,
+                    new Material(PBRColorAttribute.createBaseColorFactor(Color.CYAN)));
+            CapsuleShapeBuilder.build(meshPartBuilder, radius, height, 30);
+            final Model model = modelBuilder.end();
+
+            rotateMesh(model);
+
+            final GameObject capsuleGo = scene.sceneGraph.addGameObject(model, scene.cam.position);
+
+            physicsComponent = Ode4jPhysicsComponentUtils.createCapsulePhysicsComponent(capsuleGo, radius, height, 10.0);
+            try {
+                capsuleGo.addComponent(physicsComponent);
+            } catch (InvalidComponentException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         if (physicsComponent != null) {
             MundusOde4jRuntimePlugin.getPhysicsWorld().getPhysicsComponents().add(physicsComponent);
 
@@ -91,6 +127,26 @@ public class CustomInputController extends InputAdapter {
             physicsComponent.getBody().setLinearVel(FORCE * camDirection.x, FORCE * camDirection.y, FORCE * camDirection.z);
         }
         return false;
+    }
+
+    // LibGDX cylinder is oriented along Y axis,  ODE4j on Z axis
+    // rotate mesh to match ODE definition of a cylinder with the main axis on Z instead of Y
+    // this hard-codes the rotation into the mesh so that we can later use transforms as normal.
+    private static void rotateMesh(Model model){
+        Vector3 v = new Vector3();
+        Mesh mesh = model.meshes.first();
+        int n = mesh.getNumVertices();
+        int stride = mesh.getVertexSize() / 4;  // size of vertex in number of floats
+        float [] vertices = new float[stride*n];
+        mesh.getVertices(vertices);
+        for(int i = 0 ; i < n; i++) {
+            v.set(vertices[i*stride], vertices[i*stride+1], vertices[i*stride+2]);
+            v.rotate(Vector3.X, 90);
+            vertices[i*stride] = v.x;
+            vertices[i*stride+1] = v.y;
+            vertices[i*stride+2] = v.z;
+        }
+        mesh.setVertices(vertices);
     }
 
 }
