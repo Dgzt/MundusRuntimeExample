@@ -28,8 +28,10 @@ allprojects {
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
         gdxControllersVersion = '2.2.1'
-        mundusVersion = 'master-SNAPSHOT'
+        mundusVersion = 'plugin-custom-asset-SNAPSHOT'
         gltfVersion = '2.2.1' // Only needed if targeting HTML, version should match what Mundus uses
+
+        recastNavMeshPluginVersion = 'master-SNAPSHOT'
     }
 
     repositories {
@@ -84,8 +86,8 @@ project(":html") {
         api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 
-        api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion:sources"
-        api "com.github.jamestkhan.mundus:commons:$mundusVersion:sources"
+        api "com.github.Dgzt.Mundus:gdx-runtime:$mundusVersion:sources"
+        api "com.github.Dgzt.Mundus:commons:$mundusVersion:sources"
         api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
     }
 }
@@ -96,7 +98,8 @@ project(":core") {
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion"
+        api "com.github.Dgzt.Mundus:gdx-runtime:$mundusVersion"
+        api "com.github.Dgzt:mundus-recast-plugin:$recastNavMeshPluginVersion"
 
     }
 }
