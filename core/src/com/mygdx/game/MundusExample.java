@@ -44,6 +44,7 @@ public class MundusExample extends ApplicationAdapter {
 
 	private DebugRenderer navMeshDebugRenderer;
 	private CustomInputController customInputController;
+	private Array<float[]> path = new Array<>();
 
 	enum GameState {
 		LOADING,
@@ -149,6 +150,9 @@ public class MundusExample extends ApplicationAdapter {
 		fpsLogger.log();
 
 		navMeshDebugRenderer.render(scene.sceneGraph);
+		if (!path.isEmpty()) {
+			navMeshDebugRenderer.render(path);
+		}
 	}
 
 	/**
@@ -174,7 +178,7 @@ public class MundusExample extends ApplicationAdapter {
 			controller.setVelocity(200f);
 
 			navMeshDebugRenderer = new DebugRenderer(scene.cam);
-			customInputController = new CustomInputController(navMeshDebugRenderer);
+			customInputController = new CustomInputController(navMeshDebugRenderer, scene.sceneGraph, path);
 			Gdx.input.setInputProcessor(new InputMultiplexer(customInputController, controller));
 
 			// Update our game state
