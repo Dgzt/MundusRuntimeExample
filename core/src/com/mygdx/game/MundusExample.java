@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.github.dgzt.mundus.plugin.recast.converter.RecastNavMesComponentConverter;
+import com.github.dgzt.mundus.plugin.recast.debug.DebugRenderer;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
@@ -39,6 +41,9 @@ public class MundusExample extends ApplicationAdapter {
 	private Array<Vector3> cameraDestinations;
 	private int currentCameraDestIndex = 0;
 	private final Vector3 lookAtPos = new Vector3(800,0,800);
+
+	private DebugRenderer navMeshDebugRenderer;
+	private CustomInputController customInputController;
 
 	enum GameState {
 		LOADING,
@@ -142,6 +147,8 @@ public class MundusExample extends ApplicationAdapter {
 		scene.sceneGraph.update();
 		scene.render();
 		fpsLogger.log();
+
+		navMeshDebugRenderer.render(scene.sceneGraph);
 	}
 
 	/**
@@ -165,7 +172,10 @@ public class MundusExample extends ApplicationAdapter {
 			// setup input
 			controller = new FirstPersonCameraController(scene.cam);
 			controller.setVelocity(200f);
-			Gdx.input.setInputProcessor(controller);
+
+			navMeshDebugRenderer = new DebugRenderer(scene.cam);
+			customInputController = new CustomInputController(navMeshDebugRenderer);
+			Gdx.input.setInputProcessor(new InputMultiplexer(customInputController, controller));
 
 			// Update our game state
 			gameState = GameState.PLAYING;
