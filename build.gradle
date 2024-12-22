@@ -23,7 +23,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "MundusRuntimeExample"
-        gdxVersion = '1.12.1'
+        gdxVersion = '1.13.0'
         roboVMVersion = '2.3.16'
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
@@ -89,6 +89,8 @@ project(":html") {
         api "com.github.Dgzt.Mundus:gdx-runtime:$mundusVersion:sources"
         api "com.github.Dgzt.Mundus:commons:$mundusVersion:sources"
         api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
+
+        api "com.github.Dgzt:mundus-recast-plugin:$recastNavMeshPluginVersion:sources"
     }
 }
 
