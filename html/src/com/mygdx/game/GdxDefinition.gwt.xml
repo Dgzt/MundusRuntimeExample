@@ -6,6 +6,8 @@
 	<inherits name='MundusExample' />
 	<inherits name="commons" />
 	<inherits name="com.mbrlabs.mundus" />
+	<inherits name="recast_navmesh_plugin" />
+	<inherits name="gdx_recast" />
 
 	<entry-point class='com.mygdx.game.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
