@@ -151,7 +151,10 @@ public class MundusExample extends ApplicationAdapter {
 
 		navMeshDebugRenderer.render(scene.sceneGraph);
 		if (!path.isEmpty()) {
+			final boolean navMeshDebugRendererEnabled = navMeshDebugRenderer.isEnabled();
+			navMeshDebugRenderer.setEnabled(true);
 			navMeshDebugRenderer.render(path);
+			navMeshDebugRenderer.setEnabled(navMeshDebugRendererEnabled);
 		}
 	}
 
