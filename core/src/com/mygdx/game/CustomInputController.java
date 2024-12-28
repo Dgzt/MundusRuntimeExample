@@ -5,9 +5,9 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
+import com.github.dgzt.mundus.plugin.recast.component.NavMeshAsset;
 import com.github.dgzt.mundus.plugin.recast.component.RecastNavMeshComponent;
 import com.github.dgzt.mundus.plugin.recast.debug.DebugRenderer;
-import com.github.jamestkhan.recast.Pathfinder;
 import com.mbrlabs.mundus.commons.scene3d.SceneGraph;
 import com.mbrlabs.mundus.commons.scene3d.components.Component;
 import com.mbrlabs.mundus.commons.scene3d.components.TerrainComponent;
@@ -17,7 +17,7 @@ public class CustomInputController extends InputAdapter {
     private final DebugRenderer navMeshDebugRenderer;
     private final SceneGraph sceneGraph;
     private final Array<float[]> path;
-    private final Pathfinder pathfinder;
+    private final NavMeshAsset navMeshAsset;
 
     private Vector3 startPoint;
 
@@ -27,7 +27,7 @@ public class CustomInputController extends InputAdapter {
         this.path = path;
 
         final RecastNavMeshComponent navMeshComponent = sceneGraph.findByName("Terrain 2").findComponentByType(Component.Type.NAVMESH);
-        pathfinder = new Pathfinder(navMeshComponent.getNavMeshAssets().get(0).getNavMeshData());
+        navMeshAsset = navMeshComponent.findNavMeshAssetByName("main");
     }
 
     @Override
@@ -52,7 +52,7 @@ public class CustomInputController extends InputAdapter {
             startPoint = intersection;
             path.clear();
         } else {
-            pathfinder.getPath(startPoint, intersection, path);
+            navMeshAsset.getPath(startPoint, intersection, path);
             startPoint = null;
         }
 
