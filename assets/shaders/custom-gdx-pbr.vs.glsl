@@ -238,7 +238,7 @@ uniform vec2 u_terrainSize;
 #endif
 
 #ifdef instanced
-in mat4 i_worldTrans;
+attribute mat4 i_worldTrans;
 #endif //instanced
 
 void main() {
@@ -330,21 +330,16 @@ void main() {
 		vec4 pos = u_worldTrans * vec4(morph_pos, 1.0);
 	#endif
 
-//	#ifdef instanced
-//		pos.x = pos.x * i_worldTrans.x;
-//		pos.y = pos.y * i_worldTrans.y;
-//		pos.z = pos.z * i_worldTrans.z;
-//	#endif //instanced
+	vec3 normalVec = a_normal;
+	#if defined(instanced)
+        pos *= i_worldTrans;
+		normalVec = a_normal * mat3(i_worldTrans);
+	#endif
 
 	v_clipDistance = dot(pos, u_clipPlane);
 	v_position = vec3(pos.xyz) / pos.w;
+	gl_Position = u_projViewTrans * pos;
 
-	#ifdef instanced
-		gl_Position = u_projViewTrans * i_worldTrans * pos;
-	#else
-		gl_Position = u_projViewTrans * pos;
-	#endif //instanced
-	
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;
 		v_shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
@@ -353,7 +348,7 @@ void main() {
 	
 	#if defined(normalFlag)
 		
-		vec3 morph_nor = a_normal;
+		vec3 morph_nor = normalVec;
 		#ifdef morphTargetsFlag
 			#ifdef normal0Flag
 				morph_nor += a_normal0 * u_morphTargets1.x;

@@ -101,15 +101,12 @@ public class InstancedTerrainComponent extends AbstractComponent implements Rend
                         30f,
                         430f - z * 30f);
 
-                // set random rotation
-//					q.setEulerAngles(MathUtils.random(-90, 90), MathUtils.random(-90, 90), MathUtils.random(-90, 90));
-
                 // create matrix transform
                 mat4.idt();
-                mat4.trn(vec3Temp);
+                mat4.setTranslation(vec3Temp);
 
                 // put the 16 floats for mat4 in the float buffer
-                buffer.put(mat4.getValues());
+                buffer.put(mat4.tra().getValues());
             }
         }
     }
