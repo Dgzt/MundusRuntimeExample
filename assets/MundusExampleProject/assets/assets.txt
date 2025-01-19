@@ -66,11 +66,17 @@ map_Ship2_01_AO.png
 map_Ship2_01_AO.png.meta
 Terrain 2.terra
 Terrain 2.terra.meta
+Terrain 25.terra
+Terrain 25.terra.meta
 default.terraobjectlayer
 default.terraobjectlayer.meta
 Terrain 2.terraobjects
 Terrain 2.terraobjects.meta
-Terrain 25.terra
-Terrain 25.terra.meta
 Terrain 25.terraobjects
 Terrain 25.terraobjects.meta
+tree1.gltf
+tree1.gltf.meta
+3f21_canopy.mat
+3f21_canopy.mat.meta
+3f21_trunk.mat
+3f21_trunk.mat.meta
