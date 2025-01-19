@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
@@ -169,7 +170,10 @@ public class MundusExample extends ApplicationAdapter {
 			config.vertexShader = Gdx.files.internal("shaders/custom-gdx-pbr.vs.glsl").readString();
 			config.fragmentShader = Gdx.files.internal("shaders/custom-gdx-pbr.fs.glsl").readString();
 
-			scene = mundus.loadScene("Main Scene.mundus", config);
+			DepthShader.Config depthConfig = ShaderUtils.buildPBRShaderDepthConfig(mundus.getAssetManager().maxNumBones);
+			depthConfig.vertexShader = Gdx.files.internal("shaders/custom-depth.vs.glsl").readString();
+
+			scene = mundus.loadScene("Main Scene.mundus", config, depthConfig);
 			scene.cam.position.set(0, 40, 0);
 
 			// setup input

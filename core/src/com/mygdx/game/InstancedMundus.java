@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.graphics.g3d.utils.RenderableSorter;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.runtime.Mundus;
-import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
 
 public class InstancedMundus extends Mundus {
@@ -19,7 +18,7 @@ public class InstancedMundus extends Mundus {
     public Scene loadScene(String name, PBRShaderConfig config, DepthShader.Config depthConfig, RenderableSorter renderableSorter) {
         final Scene scene = super.loadScene(name, config, depthConfig, renderableSorter);
         scene.batch = new ModelBatch(new InstancedMundusPBRShaderProvider(config), renderableSorter);
-        scene.depthBatch = new ModelBatch(new PBRDepthShaderProvider(depthConfig));
+        scene.depthBatch = new ModelBatch(new InstancedPBRDepthShaderProvider(depthConfig));
         return scene;
     }
 }
