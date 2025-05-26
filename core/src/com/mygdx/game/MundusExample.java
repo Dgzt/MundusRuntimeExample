@@ -17,8 +17,11 @@ import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
+import com.mbrlabs.mundus.commons.utils.MundusShaderParser;
+import com.mbrlabs.mundus.commons.utils.ShaderUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
 
 import static com.badlogic.gdx.Application.LOG_INFO;
 
@@ -157,7 +160,10 @@ public class MundusExample extends ApplicationAdapter {
 
 		if (mundus.continueLoading()) {
 			// Loading complete, load a scene.
-			scene = mundus.loadScene("Main Scene.mundus");
+			PBRShaderConfig config = ShaderUtils.buildPBRShaderConfig(mundus.getAssetManager().maxNumBones);
+			config.fragmentShader = MundusShaderParser.parse(Gdx.files.internal("shaders/pbr.fs.glsl"));
+
+			scene = mundus.loadScene("Main Scene.mundus", config);
 
 			scene.cam.position.set(0, 40, 0);
 
