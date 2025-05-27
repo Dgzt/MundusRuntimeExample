@@ -131,6 +131,9 @@ uniform sampler2D u_texture_splat;
     #ifdef splatAFlag
     uniform sampler2D u_texture_a;
     #endif
+    #ifdef splatLinesFlag
+    uniform sampler2D u_texture_lines;
+    #endif
 
     #ifdef splatRNormalFlag
     uniform sampler2D u_texture_r_normal;
@@ -308,6 +311,10 @@ vec4 getBaseColor()
         #ifdef splatAFlag
         vec4 colorA = getColor(u_texture_a, colorUv);
         baseColor = mix(baseColor, mix(baseColor, colorA, splat.a), colorA.a);
+        #endif
+        #ifdef splatLinesFlag
+        vec4 colorLine = getColor(u_texture_lines, colorUv);
+        baseColor = mix(baseColor, colorLine, colorLine.a);
         #endif
     #endif // splatFlag
 

@@ -8,7 +8,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.DefaultRenderableSorter;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
@@ -16,11 +20,17 @@ import com.badlogic.gdx.utils.Array;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
+import com.mbrlabs.mundus.commons.scene3d.components.Component;
+import com.mbrlabs.mundus.commons.scene3d.components.TerrainComponent;
+import com.mbrlabs.mundus.commons.terrain.Terrain;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
 import com.mbrlabs.mundus.commons.utils.MundusShaderParser;
 import com.mbrlabs.mundus.commons.utils.ShaderUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
+import com.mygdx.game.terrain.CustomMundusPBRShaderProvider;
+import com.mygdx.game.terrain.LinesTerrainMaterialAttribute;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
+import net.mgsx.gltf.scene3d.scene.SceneRenderableSorter;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
 
 import static com.badlogic.gdx.Application.LOG_INFO;
@@ -164,6 +174,10 @@ public class MundusExample extends ApplicationAdapter {
 			config.fragmentShader = MundusShaderParser.parse(Gdx.files.internal("shaders/pbr.fs.glsl"));
 
 			scene = mundus.loadScene("Main Scene.mundus", config);
+			scene.batch = new ModelBatch(new CustomMundusPBRShaderProvider(config), new SceneRenderableSorter());
+
+			setupLinesTerrainTextures();
+
 
 			scene.cam.position.set(0, 40, 0);
 
@@ -185,5 +199,27 @@ public class MundusExample extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		mundus.dispose();
+	}
+
+	private void setupLinesTerrainTextures() {
+		final Array<TerrainComponent> terrainComponents = scene.sceneGraph.getRoot().findComponentsByType(new Array<>(), Component.Type.TERRAIN, true);
+		final TerrainComponent terrainComponent = terrainComponents.first();
+		final Terrain terrain = terrainComponent.getTerrainAsset().getTerrain();
+
+		final Pixmap pixmap = new Pixmap(1600, 1600, Pixmap.Format.RGBA8888);
+//		pixmap.setColor(Color.GOLDENROD);
+		pixmap.setColor(new Color(0f, 0f, 0f, 0f));
+		pixmap.fill();
+
+		pixmap.setColor(Color.BLACK);
+//		pixmap.drawLine(100, 100, terrain.terrainWidth, terrain.terrainDepth);
+//		pixmap.drawCircle(20, 20, 5);
+		pixmap.fillRectangle(0, 0, 1000, 1000); // ?
+
+		final Texture texture = new Texture(pixmap);
+		// terrain.getMaterial().set(LinesTerrainMaterialAttribute.createLinesTerrainMaterialAttribute(texture));
+		terrainComponent.getModelInstance().materials.first().set(LinesTerrainMaterialAttribute.createLinesTerrainMaterialAttribute(texture));
+
+		pixmap.dispose();
 	}
 }
