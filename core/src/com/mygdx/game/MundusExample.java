@@ -206,7 +206,7 @@ public class MundusExample extends ApplicationAdapter {
 		final TerrainComponent terrainComponent = terrainComponents.first();
 		final Terrain terrain = terrainComponent.getTerrainAsset().getTerrain();
 
-		final Pixmap pixmap = new Pixmap(1600, 1600, Pixmap.Format.RGBA8888);
+		final Pixmap pixmap = new Pixmap(512, 512, Pixmap.Format.RGBA8888);
 //		pixmap.setColor(Color.GOLDENROD);
 		pixmap.setColor(new Color(0f, 0f, 0f, 0f));
 		pixmap.fill();
@@ -214,7 +214,7 @@ public class MundusExample extends ApplicationAdapter {
 		pixmap.setColor(Color.BLACK);
 //		pixmap.drawLine(100, 100, terrain.terrainWidth, terrain.terrainDepth);
 //		pixmap.drawCircle(20, 20, 5);
-		pixmap.fillRectangle(0, 0, 1000, 1000); // ?
+		pixmap.fillRectangle(10, 10, 492, 492); // ?
 
 		final Texture texture = new Texture(pixmap);
 		// terrain.getMaterial().set(LinesTerrainMaterialAttribute.createLinesTerrainMaterialAttribute(texture));

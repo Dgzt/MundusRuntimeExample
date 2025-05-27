@@ -313,7 +313,7 @@ vec4 getBaseColor()
         baseColor = mix(baseColor, mix(baseColor, colorA, splat.a), colorA.a);
         #endif
         #ifdef splatLinesFlag
-        vec4 colorLine = getColor(u_texture_lines, colorUv);
+        vec4 colorLine = getColor(u_texture_lines, v_splatPosition);
         baseColor = mix(baseColor, colorLine, colorLine.a);
         #endif
     #endif // splatFlag
