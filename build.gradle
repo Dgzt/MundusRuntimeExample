@@ -23,7 +23,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "MundusRuntimeExample"
-        gdxVersion = '1.13.0'
+        gdxVersion = '1.13.5'
         roboVMVersion = '2.3.16'
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
@@ -102,6 +102,8 @@ project(":core") {
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+        api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion"
         api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion"
 
         api "com.github.Dgzt:mundus-ode4j-plugin:$ode4jPluginVersion"
