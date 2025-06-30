@@ -1,45 +1,42 @@
+
+buildscript {
+  repositories {
+    mavenCentral()
+    google()
+  }
+}
 apply plugin: 'com.android.application'
 
 
 android {
-  compileSdk 31
+  namespace "com.mygdx.game"
+  compileSdk 35
   sourceSets {
     main {
       manifest.srcFile 'AndroidManifest.xml'
-      java.srcDirs = ['src/main/java']
-      aidl.srcDirs = ['src/main/java']
-      renderscript.srcDirs = ['src/main/java']
-      res.srcDirs = ['res']
-      assets.srcDirs = ['../assets']
-      jniLibs.srcDirs = ['libs']
+      java.setSrcDirs(['src/main/java'])
+      aidl.setSrcDirs(['src/main/java'])
+      renderscript.setSrcDirs(['src/main/java'])
+      res.setSrcDirs(['res'])
+      assets.setSrcDirs(['../assets'])
+      jniLibs.setSrcDirs(['libs'])
     }
   }
   packagingOptions {
-    // Preventing from license violations (more or less):
-    pickFirst 'META-INF/LICENSE.txt'
-    pickFirst 'META-INF/LICENSE'
-    pickFirst 'META-INF/license.txt'
-    pickFirst 'META-INF/LGPL2.1'
-    pickFirst 'META-INF/NOTICE.txt'
-    pickFirst 'META-INF/NOTICE'
-    pickFirst 'META-INF/notice.txt'
-    // Excluding unnecessary meta-data:
-    exclude 'META-INF/robovm/ios/robovm.xml'
-    exclude 'META-INF/DEPENDENCIES.txt'
-    exclude 'META-INF/DEPENDENCIES'
-    exclude 'META-INF/dependencies.txt'
-    // These are only used by GWT, and not Android.
-    exclude '**/*.gwt.xml'
+		resources {
+			excludes += ['META-INF/robovm/ios/robovm.xml', 'META-INF/DEPENDENCIES.txt', 'META-INF/DEPENDENCIES',
+                   'META-INF/dependencies.txt', '**/*.gwt.xml']
+			pickFirsts += ['META-INF/LICENSE.txt', 'META-INF/LICENSE', 'META-INF/license.txt', 'META-INF/LGPL2.1',
+                     'META-INF/NOTICE.txt', 'META-INF/NOTICE', 'META-INF/notice.txt']
+		}
   }
   defaultConfig {
     applicationId 'com.mygdx.game'
-    minSdkVersion 31
-    targetSdkVersion 31
+    minSdkVersion 21
+    targetSdkVersion 35
     versionCode 1
     versionName "1.0"
-    multiDexEnabled true
   }
-  namespace "com.mygdx.game"
   compileOptions {
     sourceCompatibility "11"
     targetCompatibility "11"
@@ -61,7 +58,7 @@ repositories {
 configurations { natives }
 
 dependencies {
-  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
   implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
   implementation project(':core')
 
@@ -82,7 +79,7 @@ tasks.register('copyAndroidNatives') {
     file("libs/x86_64/").mkdirs()
     file("libs/x86/").mkdirs()
 
-    configurations.getByName("natives").copy().files.each { jar ->
+    configurations.natives.copy().files.each { jar ->
       def outputDir = null
       if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
       if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
@@ -98,6 +95,7 @@ tasks.register('copyAndroidNatives') {
     }
   }
 }
+
 tasks.matching { it.name.contains("merge") && it.name.contains("JniLibFolders") }.configureEach { packageTask ->
   packageTask.dependsOn 'copyAndroidNatives'
 }

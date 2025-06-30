@@ -4,7 +4,9 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'org.gretty:gretty:3.1.0'
+    classpath 'org.gretty:gretty:3.1.5'
+    classpath "org.docstr:gwt-gradle-plugin:$gwtPluginVersion"
+
   }
 }
 apply plugin: "gwt"
@@ -16,24 +18,24 @@ gwt {
   maxHeapSize = '1G' // Default 256m is not enough for the GWT compiler. GWT is HUNGRY.
   minHeapSize = '1G'
 
-  src = files(file('src/main/java')) // Needs to be in front of "modules" below.
-  modules 'com.mygdx.game.GdxDefinition'
-  devModules 'com.mygdx.game.GdxDefinitionSuperdev'
-  project.webAppDirName = 'webapp'
+  // Needs to be in front of "modules" below.
+  src = files(file('src/main/java'), project(":core").file('src/main/java'))
+  modules += ["com.mygdx.game.GdxDefinition"]
+  devModules += ["com.mygdx.game.GdxDefinitionSuperdev"]
+  project.webAppDirName = "webapp"
 
   compiler.strict = true
   compiler.disableCastChecking = true
   //// The next line can be useful to uncomment if you want output that hasn't been obfuscated.
-//  compiler.style = org.wisepersist.gradle.plugins.gwt.Style.DETAILED
+//  compiler.style = org.docstr.gradle.plugins.gwt.Style.DETAILED
 
   sourceLevel = 1.11
 }
 
 dependencies {
+  implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
   implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-  implementation "com.github.tommyettinger:gdx-backend-gwt:1.1200.1"
-  implementation "com.github.tommyettinger:gdx-backend-gwt:1.1200.1:sources"
-  implementation "com.google.jsinterop:jsinterop-annotations:2.0.0:sources"
   api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion:sources"
   api "com.github.jamestkhan.mundus:commons:$mundusVersion:sources"
   api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
@@ -42,14 +44,16 @@ dependencies {
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
-import org.wisepersist.gradle.plugins.gwt.GwtSuperDev
+import org.docstr.gradle.plugins.gwt.GwtSuperDev
 
 gretty.httpPort = 8080
-gretty.resourceBase = project.buildDir.path + "/gwt/draftOut"
+// The line below will need to be changed only if you change the build directory to something other than "build".
+gretty.resourceBase = "${project.layout.buildDirectory.asFile.get().absolutePath}/gwt/draftOut"
 gretty.contextPath = "/"
 gretty.portPropertiesFileName = "TEMP_PORTS.properties"
 
-task startHttpServer (dependsOn: [draftCompileGwt]) {
+tasks.register('startHttpServer') {
+  dependsOn("draftCompileGwt")
   doFirst {
     copy {
       from "webapp"
@@ -61,19 +65,21 @@ task startHttpServer (dependsOn: [draftCompileGwt]) {
     }
   }
 }
-task beforeRun(type: AppBeforeIntegrationTestTask, dependsOn: startHttpServer) {
+
+tasks.register('beforeRun', AppBeforeIntegrationTestTask) {
+  dependsOn("startHttpServer")
+  gretty {
+    integrationTestTask("superDev")
+  }
   // The next line allows ports to be reused instead of
   // needing a process to be manually terminated.
   file("build/TEMP_PORTS.properties").delete()
-  // Somewhat of a hack; uses Gretty's support for wrapping a task in
-  // a start and then stop of a Jetty server that serves files while
-  // also running the SuperDev code server.
-  integrationTestTask 'superDev'
-
-  interactive false
+  interactive = false
 }
 
-task superDev(type: GwtSuperDev) {
+tasks.register('superDev', GwtSuperDev) {
+  group("gwt")
+  dependsOn("beforeRun")
   doFirst {
     gwt.modules = gwt.devModules
   }
@@ -88,7 +94,8 @@ clean.delete += [file("war")]
 // This is relative to the html/ folder.
 var outputPath = "build/dist/"
 
-task dist(dependsOn: [clean, compileGwt]) {
+tasks.register('dist') {
+  dependsOn(["clean", "compileGwt"])
   doLast {
     // Uncomment the next line if you have changed outputPath and know that its contents
     // should be replaced by a new dist build. Some large JS files are not cleaned up by
@@ -99,7 +106,7 @@ task dist(dependsOn: [clean, compileGwt]) {
 
     file(outputPath).mkdirs()
     copy {
-      from("build/gwt/out"){
+      from("build/gwt/out") {
         exclude '**/*.symbolMap' // Not used by a dist, and these can be large.
       }
       into outputPath
@@ -110,7 +117,7 @@ task dist(dependsOn: [clean, compileGwt]) {
         exclude 'refresh.png' // We don't need this button; this saves some bytes.
       }
       into outputPath
-      }
+    }
     copy {
       from("webapp") {
         // These next two lines take the index.html page and remove the superdev refresh button.
@@ -121,7 +128,7 @@ task dist(dependsOn: [clean, compileGwt]) {
         // either remove or comment out only the "filter" line above this.
       }
       into outputPath
-      }
+    }
     copy {
       from "war"
       into outputPath
@@ -129,26 +136,31 @@ task dist(dependsOn: [clean, compileGwt]) {
   }
 }
 
-task addSource {
+tasks.register('addSource') {
   doLast {
     sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
-    
+    sourceSets.main.compileClasspath += files("../core/build/generated/sources/annotationProcessor/java/main")
+    sourceSets.main.compileClasspath += files(sourceSets.main.output.resourcesDir)
+
   }
 }
 
-task distZip(type: Zip, dependsOn: dist){
+tasks.register("distZip", Zip) {
+  dependsOn("dist")
   //// This uses the output of the dist task, which removes the superdev button from index.html .
   from(outputPath)
+  archiveVersion = projectVersion
   archiveBaseName.set("${appName}-dist")
   //// The result will be in html/build/ with a name containing "-dist".
   destinationDirectory.set(file("build"))
 }
 
-tasks.compileGwt.dependsOn(addSource)
-tasks.draftCompileGwt.dependsOn(addSource)
-tasks.checkGwt.dependsOn(addSource)
+tasks.compileGwt.dependsOn("addSource")
+tasks.draftCompileGwt.dependsOn("addSource")
+tasks.checkGwt.dependsOn("addSource")
 
-sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
 eclipse.project.name = appName + "-html"

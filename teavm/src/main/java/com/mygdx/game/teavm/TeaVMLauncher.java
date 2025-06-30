@@ -6,18 +6,19 @@ import com.mygdx.game.MundusExample;
 
 /**
  * Launches the TeaVM/HTML application.
- * <br>
- * It may be important to note that if the TeaVM page is loaded from a URL with parameters,
- * that is, with a '?' sign after ".html" or some other file extension, then loading any
- * assets might not work right now. This is especially true when loading via IntelliJ IDEA's
- * built-in web server, which will default to adding on URL parameters that can be removed.
  */
 public class TeaVMLauncher {
     public static void main(String[] args) {
         TeaApplicationConfiguration config = new TeaApplicationConfiguration("canvas");
-        // change these to both 0 to use all available space, or both -1 for the canvas size.
-        config.width = 0;
-        config.height = 0;
+        //// If width and height are each greater than 0, then the app will use a fixed size.
+        //config.width = 640;
+        //config.height = 480;
+        //// If width and height are both 0, then the app will use all available space.
+        //config.width = 0;
+        //config.height = 0;
+        //// If width and height are both -1, then the app will fill the canvas size.
+        config.width = -1;
+        config.height = -1;
         new TeaApplication(new MundusExample(), config);
     }
 }
