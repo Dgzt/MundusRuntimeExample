@@ -14,6 +14,7 @@ import org.teavm.vm.TeaVMOptimizationLevel;
 public class TeaVMBuilder {
     public static void main(String[] args) throws IOException {
         TeaBuildConfiguration teaBuildConfiguration = new TeaBuildConfiguration();
+        teaBuildConfiguration.assetFilter = new MundusAssetFilter();
         teaBuildConfiguration.assetsPath.add(new AssetFileHandle("../assets"));
         teaBuildConfiguration.webappPath = new File("build/dist").getCanonicalPath();
 
@@ -32,6 +33,9 @@ public class TeaVMBuilder {
         teaBuildConfiguration.additionalAssetsClasspathFiles.add("com/mbrlabs/mundus/commons/shaders/compat.glsl");
         teaBuildConfiguration.additionalAssetsClasspathFiles.add("com/mbrlabs/mundus/commons/shaders/custom-gdx-pbr.fs.glsl");
         teaBuildConfiguration.additionalAssetsClasspathFiles.add("com/mbrlabs/mundus/commons/shaders/custom-gdx-pbr.vs.glsl");
+        teaBuildConfiguration.additionalAssetsClasspathFiles.add("com/mbrlabs/mundus/commons/shaders/pbr/pbr.vs.glsl");
+        teaBuildConfiguration.additionalAssetsClasspathFiles.add("com/mbrlabs/mundus/commons/shaders/pbr/pbr.fs.glsl");
+        teaBuildConfiguration.additionalAssetsClasspathFiles.add("com/mbrlabs/mundus/commons/shaders/pbr/material.glsl");
 
         // Register any classes or packages that require reflection here:
         TeaReflectionSupplier.addReflectionClass("com.mbrlabs.mundus.commons.dto.SceneDTO");
