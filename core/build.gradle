@@ -5,6 +5,9 @@ dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
   api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion"
 
+  implementation("com.github.xpenatan.gdx-jolt:jolt-core:$gdxJoltVersion")
+  implementation("com.github.xpenatan.gdx-jolt:jolt-gdx:$gdxJoltVersion")
+
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }

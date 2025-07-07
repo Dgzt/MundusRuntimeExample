@@ -28,6 +28,7 @@ dependencies {
   implementation "org.teavm:teavm-tooling:$teaVMVersion"
   implementation "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion"
   implementation project(':core')
+  implementation("com.github.xpenatan.gdx-jolt:jolt-teavm:$gdxJoltVersion")
 
 }
 
