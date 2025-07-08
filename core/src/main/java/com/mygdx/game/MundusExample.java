@@ -18,6 +18,8 @@ import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
+import com.mygdx.game.jolt.JoltInstance;
+import jolt.JoltLoader;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
 
 import static com.badlogic.gdx.Application.LOG_INFO;
@@ -28,7 +30,7 @@ public class MundusExample extends ApplicationAdapter {
 	private Mundus mundus;
 	private Scene scene;
 
-	private GameState gameState = GameState.LOADING;
+	private GameState gameState = GameState.INIT;
 
 	private FirstPersonCameraController controller;
 	private ShapeRenderer shapeRenderer;
@@ -40,9 +42,13 @@ public class MundusExample extends ApplicationAdapter {
 	private final Vector3 lookAtPos = new Vector3(800,0,800);
 
 	enum GameState {
+        INIT,
+        START_LOADING,
 		LOADING,
 		PLAYING
 	}
+
+    private JoltInstance joltInstance;
 
 	@Override
 	public void create () {
@@ -62,25 +68,18 @@ public class MundusExample extends ApplicationAdapter {
 		cameraDestinations.add(new Vector3(1500, 300, 1500));
 		cameraDestinations.add(new Vector3(100, 300, 1500));
 
-		Mundus.Config config = new Mundus.Config();
-		config.autoLoad = false; // Do not autoload, we want to queue custom assets
-		config.asyncLoad = true; // Do asynchronous loading
-
-		// Start asynchronous loading
-		mundus = new Mundus(Gdx.files.internal("MundusExampleProject"), config);
-		try {
-			mundus.getAssetManager().queueAssetsForLoading(true);
-		} catch (MetaFileParseException e) {
-			e.printStackTrace();
-		}
-
-		// Queuing up your own assets to include in asynchronous loading
-		mundus.getAssetManager().getGdxAssetManager().load("beach.mp3", Music.class);
+        JoltLoader.init((joltSuccess, e2) -> {
+            joltInstance = new JoltInstance();
+            gameState = GameState.START_LOADING;
+        });
 	}
 
 	@Override
 	public void render () {
 		switch (gameState) {
+            case START_LOADING:
+                startLoading();
+                break;
 			case LOADING:
 				continueLoading();
 				break;
@@ -143,6 +142,25 @@ public class MundusExample extends ApplicationAdapter {
 		fpsLogger.log();
 	}
 
+    private void startLoading() {
+        Mundus.Config config = new Mundus.Config();
+        config.autoLoad = false; // Do not autoload, we want to queue custom assets
+        config.asyncLoad = true; // Do asynchronous loading
+
+        // Start asynchronous loading
+        mundus = new Mundus(Gdx.files.internal("MundusExampleProject"), config);
+        try {
+            mundus.getAssetManager().queueAssetsForLoading(true);
+        } catch (MetaFileParseException e) {
+            e.printStackTrace();
+        }
+
+        // Queuing up your own assets to include in asynchronous loading
+        mundus.getAssetManager().getGdxAssetManager().load("beach.mp3", Music.class);
+
+        gameState = GameState.LOADING;
+    }
+
 	/**
 	 * Continue loading mundus asynchronously
 	 */
@@ -179,5 +197,6 @@ public class MundusExample extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		mundus.dispose();
+        joltInstance.dispose();
 	}
 }
