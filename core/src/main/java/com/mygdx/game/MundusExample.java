@@ -159,6 +159,10 @@ public class MundusExample extends ApplicationAdapter {
 		scene.sceneGraph.update();
 		scene.render();
 		fpsLogger.log();
+
+        debugRenderer.begin(scene.cam);
+        debugRenderer.DrawBodies(joltInstance.getPhysicsSystem(), debugSettings);
+        debugRenderer.end();
 	}
 
     private void startLoading() {

@@ -66,6 +66,10 @@ public class JoltInstance {
         physicsSystem.Init(mMaxBodies, cNumBodyMutexes, mMaxBodyPairs, mMaxContactConstraints, mBroadPhaseLayerInterface, mObjectVsBroadPhaseLayerFilter, mObjectLayerPairFilter);
     }
 
+    public PhysicsSystem getPhysicsSystem() {
+        return physicsSystem;
+    }
+
     public void update(float deltaTime, int inCollisionSteps) {
         physicsSystem.Update(deltaTime, inCollisionSteps, mTempAllocator, mJobSystem);
     }
