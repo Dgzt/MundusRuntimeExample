@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
@@ -35,6 +36,7 @@ public class MundusExample extends ApplicationAdapter {
 	private GameState gameState = GameState.INIT;
 
 	private FirstPersonCameraController controller;
+    private CustomInputController customInputController;
 	private ShapeRenderer shapeRenderer;
 	private final Color mundusTeal = new Color(0x00b695ff);
 
@@ -91,6 +93,9 @@ public class MundusExample extends ApplicationAdapter {
             case INIT_DEBUG_RENDERER:
                 debugRenderer = new DebugRenderer();
                 debugSettings = new BodyManagerDrawSettings();
+
+                customInputController = new CustomInputController(debugRenderer);
+                Gdx.input.setInputProcessor(new InputMultiplexer(controller, customInputController));
 
                 gameState = GameState.PLAYING;
                break;
@@ -205,7 +210,6 @@ public class MundusExample extends ApplicationAdapter {
 			// setup input
 			controller = new FirstPersonCameraController(scene.cam);
 			controller.setVelocity(200f);
-			Gdx.input.setInputProcessor(controller);
 
 			// Update our game state
 			gameState = GameState.INIT_DEBUG_RENDERER;
