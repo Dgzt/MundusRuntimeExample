@@ -20,6 +20,8 @@ import com.mbrlabs.mundus.commons.utils.LightUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
 import com.mygdx.game.jolt.JoltInstance;
 import jolt.JoltLoader;
+import jolt.gdx.DebugRenderer;
+import jolt.physics.body.BodyManagerDrawSettings;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
 
 import static com.badlogic.gdx.Application.LOG_INFO;
@@ -45,10 +47,13 @@ public class MundusExample extends ApplicationAdapter {
         INIT,
         START_LOADING,
 		LOADING,
+        INIT_DEBUG_RENDERER,
 		PLAYING
 	}
 
     private JoltInstance joltInstance;
+    private DebugRenderer debugRenderer;
+    private BodyManagerDrawSettings debugSettings;
 
 	@Override
 	public void create () {
@@ -83,6 +88,12 @@ public class MundusExample extends ApplicationAdapter {
 			case LOADING:
 				continueLoading();
 				break;
+            case INIT_DEBUG_RENDERER:
+                debugRenderer = new DebugRenderer();
+                debugSettings = new BodyManagerDrawSettings();
+
+                gameState = GameState.PLAYING;
+               break;
 			case PLAYING:
                 // Don't go below 30 Hz to prevent spiral of death
                 float deltaTime = (float)Math.min(Gdx.graphics.getDeltaTime(), 1.0 / 30.0);
@@ -193,7 +204,7 @@ public class MundusExample extends ApplicationAdapter {
 			Gdx.input.setInputProcessor(controller);
 
 			// Update our game state
-			gameState = GameState.PLAYING;
+			gameState = GameState.INIT_DEBUG_RENDERER;
 
 			// Retrieve custom asset we queued
 			Music music = mundus.getAssetManager().getGdxAssetManager().get("beach.mp3");
@@ -205,6 +216,8 @@ public class MundusExample extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		mundus.dispose();
+        debugRenderer.dispose();
+        debugSettings.dispose();
         joltInstance.dispose();
 	}
 }
