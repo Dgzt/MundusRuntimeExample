@@ -17,12 +17,27 @@ import com.badlogic.gdx.utils.Array;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
+import com.mbrlabs.mundus.commons.scene3d.components.Component;
+import com.mbrlabs.mundus.commons.scene3d.components.TerrainComponent;
+import com.mbrlabs.mundus.commons.terrain.Terrain;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
 import com.mygdx.game.jolt.JoltInstance;
+import com.mygdx.game.jolt.Layers;
+import jolt.Jolt;
 import jolt.JoltLoader;
+import jolt.enums.EActivation;
+import jolt.enums.EMotionType;
 import jolt.gdx.DebugRenderer;
+import jolt.geometry.Triangle;
+import jolt.geometry.TriangleList;
+import jolt.math.Quat;
+import jolt.math.Vec3;
+import jolt.physics.body.Body;
+import jolt.physics.body.BodyCreationSettings;
+import jolt.physics.body.BodyInterface;
 import jolt.physics.body.BodyManagerDrawSettings;
+import jolt.physics.collision.shape.MeshShapeSettings;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
 
 import static com.badlogic.gdx.Application.LOG_INFO;
@@ -56,6 +71,7 @@ public class MundusExample extends ApplicationAdapter {
     private JoltInstance joltInstance;
     private DebugRenderer debugRenderer;
     private BodyManagerDrawSettings debugSettings;
+    private BodyInterface bodyInterface;
 
 	@Override
 	public void create () {
@@ -77,6 +93,7 @@ public class MundusExample extends ApplicationAdapter {
 
         JoltLoader.init((joltSuccess, e2) -> {
             joltInstance = new JoltInstance();
+            bodyInterface = joltInstance.getPhysicsSystem().GetBodyInterface();
             gameState = GameState.START_LOADING;
         });
 	}
@@ -218,6 +235,8 @@ public class MundusExample extends ApplicationAdapter {
 			Music music = mundus.getAssetManager().getGdxAssetManager().get("beach.mp3");
 			music.setVolume(0.05f);
 			music.play();
+
+            initializePhysics();
 		}
 	}
 
@@ -228,4 +247,56 @@ public class MundusExample extends ApplicationAdapter {
         debugSettings.dispose();
         joltInstance.dispose();
 	}
+
+
+    private void initializePhysics() {
+        final Body terrain = createTerrainPhysics();
+        terrain.SetFriction(1.0f);
+    }
+
+    private Body createTerrainPhysics() {
+        final TerrainComponent terrainComponent = scene.sceneGraph.getRoot().findComponentsByType(new Array<TerrainComponent>(), Component.Type.TERRAIN, true).first();
+        final Terrain terrain = terrainComponent.getTerrainAsset().getTerrain();
+
+        final Vector3 vertexC00 = new Vector3();
+        final Vector3 vertexC11 = new Vector3();
+        final Vector3 vertexC10 = new Vector3();
+        final Vector3 vertexC01 = new Vector3();
+
+        final TriangleList triangles = new TriangleList();
+        for (int x = 0; x < terrain.vertexResolution - 1; ++x) {
+            for (int z = 0; z < terrain.vertexResolution - 1; ++z) {
+                terrain.getVertexPosition(vertexC00, x, z);
+                terrain.getVertexPosition(vertexC01, x, z + 1);
+                terrain.getVertexPosition(vertexC10, x + 1, z);
+                terrain.getVertexPosition(vertexC11, x + 1, z + 1);
+
+                final Vec3 c00 = Jolt.New_Vec3(vertexC00.x, vertexC00.y, vertexC00.z);
+                final Vec3 c01 = Jolt.New_Vec3(vertexC01.x, vertexC01.y, vertexC01.z);
+                final Vec3 c10 = Jolt.New_Vec3(vertexC10.x, vertexC10.y, vertexC10.z);
+                final Vec3 c11 = Jolt.New_Vec3(vertexC11.x, vertexC11.y, vertexC11.z);
+
+                Triangle triangle1 = new Triangle(c00, c11, c10);
+                Triangle triangle2 = new Triangle(c00, c11, c01);
+                triangles.push_back(triangle1);
+                triangles.push_back(triangle2);
+
+                triangle1.dispose();
+                triangle2.dispose();
+                c00.dispose();
+                c01.dispose();
+                c10.dispose();
+                c11.dispose();
+            }
+
+        }
+
+        BodyCreationSettings bodyCreationSettings = Jolt.New_BodyCreationSettings(new MeshShapeSettings(triangles), Vec3.sZero(), Quat.sIdentity(), EMotionType.Static, Layers.NON_MOVING);
+        Body floor = bodyInterface.CreateBody(bodyCreationSettings);
+        bodyInterface.AddBody(floor.GetID(), EActivation.DontActivate);
+        triangles.dispose();
+        bodyCreationSettings.dispose();
+
+        return floor;
+    }
 }
