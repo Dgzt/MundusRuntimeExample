@@ -112,7 +112,7 @@ public class MundusExample extends ApplicationAdapter {
                 debugSettings = new BodyManagerDrawSettings();
 
                 customInputController = new CustomInputController(debugRenderer);
-                Gdx.input.setInputProcessor(new InputMultiplexer(controller, customInputController));
+                Gdx.input.setInputProcessor(new InputMultiplexer(customInputController, controller));
 
                 gameState = GameState.PLAYING;
                break;
