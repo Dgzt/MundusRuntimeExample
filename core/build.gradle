@@ -6,6 +6,8 @@ dependencies {
   api "com.github.jamestkhan.mundus:gdx-runtime:$mundusVersion"
   api "com.github.Dgzt:mundus-jolt-physics-plugin:$joltPhysicsPluginVersion"
   api("com.github.xpenatan.jParser:loader-core:$jParserLoaderVersion")
+  api("com.github.xpenatan.gdx-jolt:jolt-core:$gdxJoltVersion")
+  api("com.github.xpenatan.gdx-jolt:jolt-gdx:$gdxJoltVersion")
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
