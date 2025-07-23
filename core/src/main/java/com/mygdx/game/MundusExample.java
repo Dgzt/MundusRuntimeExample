@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.github.dgzt.mundus.plugin.joltphysics.runtime.JoltPhysicsPlugin;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
@@ -76,6 +77,13 @@ public class MundusExample extends ApplicationAdapter {
 
 		// Queuing up your own assets to include in asynchronous loading
 		mundus.getAssetManager().getGdxAssetManager().load("beach.mp3", Music.class);
+
+        JoltPhysicsPlugin.init((joltSuccess, exception) -> {
+            Gdx.app.log("", "Jolt Physics loaded: " + joltSuccess);
+            if (!joltSuccess) {
+                Gdx.app.error("", "Jolt Physics can not load", exception);
+            }
+        });
 	}
 
 	@Override
@@ -179,5 +187,6 @@ public class MundusExample extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		mundus.dispose();
+        JoltPhysicsPlugin.dispose();
 	}
 }
