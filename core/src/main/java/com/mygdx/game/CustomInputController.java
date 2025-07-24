@@ -10,19 +10,24 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
+import com.badlogic.gdx.math.Vector3;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.JoltPhysicsPlugin;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.component.JoltPhysicsComponent;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.manager.ComponentManager;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.scene3d.GameObject;
 import com.mbrlabs.mundus.commons.scene3d.InvalidComponentException;
+import jolt.Jolt;
 import jolt.gdx.DebugRenderer;
+import jolt.math.Vec3;
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 
 public class CustomInputController extends InputAdapter {
     private static final float BOX_WIDTH = 1.0f;
     private static final float BOX_HEIGHT = 1.0f;
     private static final float BOX_DEPTH = 1.0f;
+
+    private static final float FORCE = 50.0f;
 
     private final Scene scene;
     private final DebugRenderer debugRenderer;
@@ -42,6 +47,8 @@ public class CustomInputController extends InputAdapter {
             return true;
         }
 
+        JoltPhysicsComponent physicsComponent = null;
+
         if (Input.Keys.NUM_1 == keycode) {
             final ModelBuilder modelBuilder = new ModelBuilder();
             modelBuilder.begin();
@@ -55,13 +62,21 @@ public class CustomInputController extends InputAdapter {
 
             final GameObject boxGo = scene.sceneGraph.addGameObject(model, scene.cam.position);
 
-            final JoltPhysicsComponent physicsComponent = componentManager.createBoxPhysicsComponent(boxGo, 10f);
+            physicsComponent = componentManager.createBoxPhysicsComponent(boxGo, 10f);
 
             try {
                 boxGo.addComponent(physicsComponent);
             } catch (InvalidComponentException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        if (physicsComponent != null) {
+            final Vector3 camDirection = scene.cam.direction;
+
+            final Vec3 velocity = Jolt.New_Vec3();
+            velocity.Set(FORCE * camDirection.x, FORCE * camDirection.y, FORCE * camDirection.z);
+            physicsComponent.getBody().SetLinearVelocity(velocity);
         }
 
         return false;
