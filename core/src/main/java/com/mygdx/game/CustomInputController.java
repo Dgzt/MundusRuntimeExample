@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.JoltPhysicsPlugin;
@@ -29,6 +30,9 @@ public class CustomInputController extends InputAdapter {
     private static final float BOX_DEPTH = 1.0f;
 
     private static final float SPHERE_RADIUS = 1.0f;
+
+    private static final float CYLINDER_RADIUS = 0.5f;
+    private static final float CYLINDER_HEIGHT = 2.0f;
 
     private static final float FORCE = 50.0f;
 
@@ -91,6 +95,28 @@ public class CustomInputController extends InputAdapter {
 
             try {
                 sphereGo.addComponent(physicsComponent);
+            } catch (InvalidComponentException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (Input.Keys.NUM_3 == keycode) {
+            final ModelBuilder modelBuilder = new ModelBuilder();
+            modelBuilder.begin();
+            final MeshPartBuilder meshPartBuilder = modelBuilder.part(
+                    "part",
+                    GL30.GL_TRIANGLES,
+                    VertexAttributes.Usage.Position,
+                    new Material(PBRColorAttribute.createBaseColorFactor(Color.BLUE)));
+            CylinderShapeBuilder.build(meshPartBuilder, CYLINDER_RADIUS * 2f, CYLINDER_HEIGHT, CYLINDER_RADIUS * 2f, 10);
+            final Model model = modelBuilder.end();
+
+            final GameObject cylinderGo = scene.sceneGraph.addGameObject(model, scene.cam.position);
+
+            physicsComponent = componentManager.createCylinderPhysicsComponent(cylinderGo, CYLINDER_RADIUS, CYLINDER_HEIGHT, 10f);
+
+            try {
+                cylinderGo.addComponent(physicsComponent);
             } catch (InvalidComponentException e) {
                 throw new RuntimeException(e);
             }
