@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.JoltPhysicsPlugin;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.component.JoltPhysicsComponent;
@@ -26,6 +27,8 @@ public class CustomInputController extends InputAdapter {
     private static final float BOX_WIDTH = 1.0f;
     private static final float BOX_HEIGHT = 1.0f;
     private static final float BOX_DEPTH = 1.0f;
+
+    private static final float SPHERE_RADIUS = 1.0f;
 
     private static final float FORCE = 50.0f;
 
@@ -66,6 +69,28 @@ public class CustomInputController extends InputAdapter {
 
             try {
                 boxGo.addComponent(physicsComponent);
+            } catch (InvalidComponentException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (Input.Keys.NUM_2 == keycode) {
+            final ModelBuilder modelBuilder = new ModelBuilder();
+            modelBuilder.begin();
+            final MeshPartBuilder meshPartBuilder = modelBuilder.part(
+                    "part",
+                    GL30.GL_TRIANGLES,
+                    VertexAttributes.Usage.Position,
+                    new Material(PBRColorAttribute.createBaseColorFactor(Color.GREEN)));
+            SphereShapeBuilder.build(meshPartBuilder, SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS, 10, 10);
+            final Model model = modelBuilder.end();
+
+            final GameObject sphereGo = scene.sceneGraph.addGameObject(model, scene.cam.position);
+
+            physicsComponent = componentManager.createSpherePhysicsComponent(sphereGo, SPHERE_RADIUS, 10f);
+
+            try {
+                sphereGo.addComponent(physicsComponent);
             } catch (InvalidComponentException e) {
                 throw new RuntimeException(e);
             }
