@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CapsuleShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder;
 import com.badlogic.gdx.math.Vector3;
@@ -33,6 +34,9 @@ public class CustomInputController extends InputAdapter {
 
     private static final float CYLINDER_RADIUS = 0.5f;
     private static final float CYLINDER_HEIGHT = 2.0f;
+
+    private static final float CAPSULE_RADIUS = 0.5f;
+    private static final float CAPSULE_HEIGHT = 2.0f;
 
     private static final float FORCE = 50.0f;
 
@@ -117,6 +121,28 @@ public class CustomInputController extends InputAdapter {
 
             try {
                 cylinderGo.addComponent(physicsComponent);
+            } catch (InvalidComponentException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (Input.Keys.NUM_4 == keycode) {
+            final ModelBuilder modelBuilder = new ModelBuilder();
+            modelBuilder.begin();
+            final MeshPartBuilder meshPartBuilder = modelBuilder.part(
+                    "part",
+                    GL30.GL_TRIANGLES,
+                    VertexAttributes.Usage.Position,
+                    new Material(PBRColorAttribute.createBaseColorFactor(Color.CYAN)));
+            CapsuleShapeBuilder.build(meshPartBuilder, CAPSULE_RADIUS, CAPSULE_HEIGHT, 10);
+            final Model model = modelBuilder.end();
+
+            final GameObject capsuleGo = scene.sceneGraph.addGameObject(model, scene.cam.position);
+
+            physicsComponent = componentManager.createCapsulePhysicsComponent(capsuleGo, CAPSULE_RADIUS, CAPSULE_HEIGHT, 10f);
+
+            try {
+                capsuleGo.addComponent(physicsComponent);
             } catch (InvalidComponentException e) {
                 throw new RuntimeException(e);
             }
