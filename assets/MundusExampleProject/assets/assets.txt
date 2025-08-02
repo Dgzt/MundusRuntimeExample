@@ -68,3 +68,7 @@ Terrain 2.terra
 Terrain 2.terra.meta
 Terrain 25.terra
 Terrain 25.terra.meta
+Terrain 2.terrainobjectslayer
+Terrain 2.terrainobjectslayer.meta
+Terrain 2.terrainobjects
+Terrain 2.terrainobjects.meta
