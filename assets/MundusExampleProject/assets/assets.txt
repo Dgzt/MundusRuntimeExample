@@ -72,3 +72,9 @@ Terrain 2.terrainobjectslayer
 Terrain 2.terrainobjectslayer.meta
 Terrain 2.terrainobjects
 Terrain 2.terrainobjects.meta
+tree1.gltf
+tree1.gltf.meta
+1dca_trunk.mat
+1dca_trunk.mat.meta
+1dca_canopy.mat
+1dca_canopy.mat.meta
