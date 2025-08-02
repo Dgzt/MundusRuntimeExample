@@ -8,22 +8,33 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.github.dgzt.mundus.plugin.terrainobjects.runtime.config.RuntimeConfig;
 import com.github.dgzt.mundus.plugin.terrainobjects.runtime.converter.TerrainObjectsComponentConverter;
+import com.github.dgzt.mundus.plugin.terrainobjects.runtime.shader.MundusInstancedPBRSDepthShaderProvider;
+import com.github.dgzt.mundus.plugin.terrainobjects.runtime.shader.MundusInstancedPBRShaderProvider;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
+import com.mbrlabs.mundus.commons.utils.MundusShaderParser;
+import com.mbrlabs.mundus.commons.utils.ShaderUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
+import net.mgsx.gltf.scene3d.scene.SceneRenderableSorter;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
 
 import static com.badlogic.gdx.Application.LOG_INFO;
 
 public class MundusExample extends ApplicationAdapter {
+    private static final boolean INSTANCED_VERSION = true;
+
 	private FPSLogger fpsLogger;
 
 	private Mundus mundus;
@@ -68,7 +79,9 @@ public class MundusExample extends ApplicationAdapter {
 		config.asyncLoad = true; // Do asynchronous loading
 
 		// Start asynchronous loading
-		mundus = new Mundus(Gdx.files.internal("MundusExampleProject"), config, new TerrainObjectsComponentConverter());
+        final RuntimeConfig terrainObjectConfig = new RuntimeConfig();
+        terrainObjectConfig.setUseInstances(INSTANCED_VERSION);
+		mundus = new Mundus(Gdx.files.internal("MundusExampleProject"), config, new TerrainObjectsComponentConverter(terrainObjectConfig));
 		try {
 			mundus.getAssetManager().queueAssetsForLoading(true);
 		} catch (MetaFileParseException e) {
@@ -159,6 +172,19 @@ public class MundusExample extends ApplicationAdapter {
 		if (mundus.continueLoading()) {
 			// Loading complete, load a scene.
 			scene = mundus.loadScene("Main Scene.mundus");
+
+            if (INSTANCED_VERSION) {
+                scene.batch.dispose();
+                final PBRShaderConfig config = ShaderUtils.buildPBRShaderConfig(mundus.getAssetManager().maxNumBones);
+                config.vertexShader = MundusShaderParser.parse(Gdx.files.classpath("com/github/dgzt/mundus/plugin/terrainobjects/runtime/shader/instanced-pbr.vs.glsl"));
+                scene.batch = new ModelBatch(new MundusInstancedPBRShaderProvider(config), new SceneRenderableSorter());
+
+                scene.depthBatch.dispose();
+                final DepthShader.Config depthConfig = ShaderUtils.buildPBRShaderDepthConfig(mundus.getAssetManager().maxNumBones);
+                depthConfig.vertexShader = MundusShaderParser.parse(Gdx.files.classpath("com/github/dgzt/mundus/plugin/terrainobjects/runtime/shader/instanced-depth.vs.glsl"));
+                scene.depthBatch = new ModelBatch(new MundusInstancedPBRSDepthShaderProvider(depthConfig));
+            }
+
 
 			scene.cam.position.set(0, 40, 0);
 
