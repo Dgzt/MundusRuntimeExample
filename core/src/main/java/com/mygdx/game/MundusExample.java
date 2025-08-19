@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.github.dgzt.mundus.plugin.joltphysics.runtime.InitResult;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.JoltPhysicsPlugin;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.component.JoltPhysicsComponent;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.manager.BodyManager;
@@ -27,8 +28,11 @@ import com.mbrlabs.mundus.commons.scene3d.components.TerrainComponent;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
 import jolt.gdx.DebugRenderer;
+import jolt.gdx.GdxModelBatch;
 import jolt.physics.body.BodyManagerDrawSettings;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
+
+import java.util.concurrent.CompletableFuture;
 
 import static com.badlogic.gdx.Application.LOG_INFO;
 
@@ -91,13 +95,14 @@ public class MundusExample extends ApplicationAdapter {
 		// Queuing up your own assets to include in asynchronous loading
 		mundus.getAssetManager().getGdxAssetManager().load("beach.mp3", Music.class);
 
-        JoltPhysicsPlugin.init((joltSuccess, exception) -> {
-            Gdx.app.log("", "Jolt Physics loaded: " + joltSuccess);
-            if (!joltSuccess) {
-                Gdx.app.error("", "Jolt Physics can not load", exception);
+        final CompletableFuture<InitResult> future = JoltPhysicsPlugin.init();
+        future.thenAccept(initResult -> {
+            Gdx.app.log("", "Jolt Physics loaded: " + initResult.isSuccess());
+            if (!initResult.isSuccess()) {
+                Gdx.app.error("", "Jolt Physics can not load", initResult.getException());
             }
         });
-	}
+    }
 
 	@Override
 	public void render () {
@@ -106,7 +111,7 @@ public class MundusExample extends ApplicationAdapter {
 				continueLoading();
 				break;
             case INIT_DEBUG_RENDERER:
-                debugRenderer = new DebugRenderer(false);
+                debugRenderer = new DebugRenderer(new GdxModelBatch(),false);
                 debugSettings = new BodyManagerDrawSettings();
 
                 final CustomInputController customInputController = new CustomInputController(scene, debugRenderer);

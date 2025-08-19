@@ -38,7 +38,7 @@ dependencies {
 
     }
 
-  implementation("com.github.xpenatan.gdx-jolt:jolt-desktop:$gdxJoltVersion")
+  implementation("com.github.xpenatan.xJolt:jolt-desktop:$gdxJoltVersion")
 }
 
 def os = System.properties['os.name'].toLowerCase()
