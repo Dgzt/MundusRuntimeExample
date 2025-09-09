@@ -20,9 +20,11 @@ import com.github.dgzt.mundus.plugin.joltphysics.runtime.manager.ComponentManage
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.scene3d.GameObject;
 import com.mbrlabs.mundus.commons.scene3d.InvalidComponentException;
-import jolt.Jolt;
+import jolt.RRayCast;
 import jolt.gdx.DebugRenderer;
 import jolt.math.Vec3;
+import jolt.physics.collision.CastRayClosestHitCollisionCollector;
+import jolt.physics.collision.RayCastSettings;
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 
 public class CustomInputController extends InputAdapter {
@@ -151,9 +153,36 @@ public class CustomInputController extends InputAdapter {
         if (physicsComponent != null) {
             final Vector3 camDirection = scene.cam.direction;
 
-            final Vec3 velocity = Jolt.New_Vec3();
+            final Vec3 velocity = new Vec3();
             velocity.Set(FORCE * camDirection.x, FORCE * camDirection.y, FORCE * camDirection.z);
             physicsComponent.getBody().SetLinearVelocity(velocity);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
+        if (Input.Buttons.LEFT == button) {
+            final var sceneRay = scene.cam.getPickRay(screenX, screenY);
+            sceneRay.direction.scl(10_000f);
+
+            final var rayOrigin = new Vec3(sceneRay.origin.x, sceneRay.origin.y, sceneRay.origin.z);
+            final var rayDirection = new Vec3(sceneRay.direction.x, sceneRay.direction.y, sceneRay.direction.z);
+
+            final var ray = new RRayCast(rayOrigin, rayDirection);
+            final var settings = new RayCastSettings();
+            final var collector = new CastRayClosestHitCollisionCollector();
+
+            JoltPhysicsPlugin.getPhysicsSystem().GetNarrowPhaseQuery().CastRay(ray, settings, collector);
+
+            System.out.println(collector.HadHit());
+
+            rayOrigin.dispose();
+            rayDirection.dispose();
+            ray.dispose();
+            settings.dispose();
+            collector.dispose();
         }
 
         return false;
