@@ -1,7 +1,7 @@
 package com.mygdx.game.lwjgl3;
 
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.github.dgzt.gdx.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.github.dgzt.gdx.lwjgl3.Lwjgl3VulkanApplication;
 import com.mygdx.game.MundusExample;
 
 /** Launches the desktop (LWJGL3) application. */
@@ -11,8 +11,8 @@ public class Lwjgl3Launcher {
         createApplication();
     }
 
-    private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new MundusExample(), getDefaultConfiguration());
+    private static Lwjgl3VulkanApplication createApplication() {
+        return new Lwjgl3VulkanApplication(new MundusExample(), getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
@@ -20,7 +20,7 @@ public class Lwjgl3Launcher {
         configuration.setTitle("MundusExample");
         //// Vsync limits the frames per second to what your hardware can display, and helps eliminate
         //// screen tearing. This setting doesn't always work on Linux, so the line after is a safeguard.
-        configuration.useVsync(true);
+        configuration.useVsync(false);
         //// Limits FPS to the refresh rate of the currently active monitor, plus 1 to try to match fractional
         //// refresh rates. The Vsync setting above should limit the actual FPS to match the monitor.
         configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
@@ -32,6 +32,8 @@ public class Lwjgl3Launcher {
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
         //// They can also be loaded from the root of assets/ .
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
+
+        configuration.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES32, 0, 0);
         return configuration;
     }
 }
