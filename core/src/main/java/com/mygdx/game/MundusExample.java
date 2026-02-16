@@ -16,15 +16,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.InitResult;
 import com.github.dgzt.mundus.plugin.joltphysics.runtime.JoltPhysicsPlugin;
-import com.github.dgzt.mundus.plugin.joltphysics.runtime.component.JoltPhysicsComponent;
-import com.github.dgzt.mundus.plugin.joltphysics.runtime.manager.BodyManager;
-import com.github.dgzt.mundus.plugin.joltphysics.runtime.manager.ComponentManager;
+import com.github.dgzt.mundus.plugin.joltphysics.runtime.converter.JoltPhysicsComponentConverter;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.SkyboxAsset;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
-import com.mbrlabs.mundus.commons.scene3d.InvalidComponentException;
-import com.mbrlabs.mundus.commons.scene3d.components.Component;
-import com.mbrlabs.mundus.commons.scene3d.components.TerrainComponent;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
 import jolt.gdx.JoltDebugRenderer;
@@ -83,7 +78,7 @@ public class MundusExample extends ApplicationAdapter {
 		config.asyncLoad = true; // Do asynchronous loading
 
 		// Start asynchronous loading
-		mundus = new Mundus(Gdx.files.internal("MundusExampleProject"), config);
+		mundus = new Mundus(Gdx.files.internal("MundusExampleProject"), config, new JoltPhysicsComponentConverter());
 		try {
 			mundus.getAssetManager().queueAssetsForLoading(true);
 		} catch (MetaFileParseException e) {
@@ -211,8 +206,6 @@ public class MundusExample extends ApplicationAdapter {
 			Music music = mundus.getAssetManager().getGdxAssetManager().get("beach.mp3");
 			music.setVolume(0.05f);
 			music.play();
-
-            initializePhysics();
 		}
 	}
 
@@ -224,18 +217,4 @@ public class MundusExample extends ApplicationAdapter {
         JoltPhysicsPlugin.dispose();
 	}
 
-    private void initializePhysics() {
-        final BodyManager bodyManager = JoltPhysicsPlugin.getBodyManager();
-        final ComponentManager componentManager = JoltPhysicsPlugin.getComponentManager();
-
-        final TerrainComponent terrainComponent = scene.sceneGraph.getRoot().findComponentsByType(new Array<TerrainComponent>(), Component.Type.TERRAIN, true).first();
-
-        final JoltPhysicsComponent joltPhysicsComponent = componentManager.createTerrainPhysicsComponent(terrainComponent.gameObject);
-
-        try {
-            terrainComponent.gameObject.addComponent(joltPhysicsComponent);
-        } catch (InvalidComponentException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
