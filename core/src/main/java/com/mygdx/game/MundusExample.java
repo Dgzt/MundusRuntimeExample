@@ -27,12 +27,10 @@ import com.mbrlabs.mundus.commons.scene3d.components.Component;
 import com.mbrlabs.mundus.commons.scene3d.components.TerrainComponent;
 import com.mbrlabs.mundus.commons.utils.LightUtils;
 import com.mbrlabs.mundus.runtime.Mundus;
-import jolt.gdx.DebugRenderer;
-import jolt.gdx.GdxModelBatch;
+import jolt.gdx.JoltDebugRenderer;
+import jolt.gdx.gl.GdxDebugRenderer;
 import jolt.physics.body.BodyManagerDrawSettings;
 import net.mgsx.gltf.scene3d.attributes.FogAttribute;
-
-import java.util.concurrent.CompletableFuture;
 
 import static com.badlogic.gdx.Application.LOG_INFO;
 
@@ -59,7 +57,7 @@ public class MundusExample extends ApplicationAdapter {
 		PLAYING
 	}
 
-    private DebugRenderer debugRenderer;
+    private JoltDebugRenderer debugRenderer;
     private BodyManagerDrawSettings debugSettings;
 
 	@Override
@@ -95,13 +93,11 @@ public class MundusExample extends ApplicationAdapter {
 		// Queuing up your own assets to include in asynchronous loading
 		mundus.getAssetManager().getGdxAssetManager().load("beach.mp3", Music.class);
 
-        final CompletableFuture<InitResult> future = JoltPhysicsPlugin.init();
-        future.thenAccept(initResult -> {
-            Gdx.app.log("", "Jolt Physics loaded: " + initResult.isSuccess());
-            if (!initResult.isSuccess()) {
-                Gdx.app.error("", "Jolt Physics can not load", initResult.getException());
-            }
-        });
+        final InitResult initResult = JoltPhysicsPlugin.init();
+        Gdx.app.log("", "Jolt Physics loaded: " + initResult.isSuccess());
+        if (!initResult.isSuccess()) {
+            Gdx.app.error("", "Jolt Physics can not load", initResult.getException());
+        }
     }
 
 	@Override
@@ -111,7 +107,8 @@ public class MundusExample extends ApplicationAdapter {
 				continueLoading();
 				break;
             case INIT_DEBUG_RENDERER:
-                debugRenderer = new DebugRenderer(new GdxModelBatch(),false);
+                debugRenderer = new GdxDebugRenderer();
+                debugRenderer.setEnable(false);
                 debugSettings = new BodyManagerDrawSettings();
 
                 final CustomInputController customInputController = new CustomInputController(scene, debugRenderer);
@@ -120,7 +117,7 @@ public class MundusExample extends ApplicationAdapter {
                 gameState = GameState.PLAYING;
                 break;
 			case PLAYING:
-                JoltPhysicsPlugin.update();
+                JoltPhysicsPlugin.update(Gdx.graphics.getDeltaTime());
 
 				play();
 				break;

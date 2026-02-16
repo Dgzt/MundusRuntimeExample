@@ -21,7 +21,7 @@ import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.scene3d.GameObject;
 import com.mbrlabs.mundus.commons.scene3d.InvalidComponentException;
 import jolt.RRayCast;
-import jolt.gdx.DebugRenderer;
+import jolt.gdx.JoltDebugRenderer;
 import jolt.math.Vec3;
 import jolt.physics.collision.CastRayClosestHitCollisionCollector;
 import jolt.physics.collision.RayCastSettings;
@@ -43,10 +43,10 @@ public class CustomInputController extends InputAdapter {
     private static final float FORCE = 50.0f;
 
     private final Scene scene;
-    private final DebugRenderer debugRenderer;
+    private final JoltDebugRenderer debugRenderer;
     private final ComponentManager componentManager;
 
-    public CustomInputController(final Scene scene, final DebugRenderer debugRenderer) {
+    public CustomInputController(final Scene scene, final JoltDebugRenderer debugRenderer) {
         this.scene = scene;
         this.debugRenderer = debugRenderer;
         componentManager = JoltPhysicsPlugin.getComponentManager();
